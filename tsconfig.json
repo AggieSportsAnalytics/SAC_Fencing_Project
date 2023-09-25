@@ -1,0 +1,16 @@
+{
+  "extends": "../tsconfig",
+  "include": [
+    "src/"
+  ],
+  "exclude": [
+    "node_modules/"
+  ],
+  "compilerOptions": {
+    "outDir": "./dist",
+    "baseUrl": "./", // Specifies the base directory for resolving modules
+    "paths": {
+      "*": ["src/*"] // Maps all module imports to the 'src' directory
+    }
+  }
+}
