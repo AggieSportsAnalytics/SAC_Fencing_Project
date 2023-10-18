@@ -1,0 +1,240 @@
+"use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __makeTemplateObject = (this && this.__makeTemplateObject) || function (cooked, raw) {
+    if (Object.defineProperty) { Object.defineProperty(cooked, "raw", { value: raw }); } else { cooked.raw = raw; }
+    return cooked;
+};
+var __values = (this && this.__values) || function (o) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator], i = 0;
+    if (m) return m.call(o);
+    return {
+        next: function () {
+            if (o && i >= o.length) o = void 0;
+            return { value: o && o[i++], done: !o };
+        }
+    };
+};
+var __read = (this && this.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+var __spread = (this && this.__spread) || function () {
+    for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
+    return ar;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var _a, _b;
+var path_1 = require("path");
+var Lint = require("tslint");
+var ts = require("typescript");
+var OPTION_SEARCH_DEPTH_LIMIT = 'search-depth-limit';
+var OPTION_SEARCH_DEPTH_LIMIT_DEFAULT = 50;
+var Rule = /** @class */ (function (_super) {
+    __extends(Rule, _super);
+    function Rule() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    Rule.prototype.applyWithProgram = function (sourceFile, program) {
+        var resolvedFile = sourceFile.fileName;
+        imports.delete(resolvedFile);
+        var compilerOptions = program.getCompilerOptions();
+        var ruleArguments = this.ruleArguments[0] || {};
+        return this.applyWithFunction(sourceFile, walk, {
+            compilerOptions: compilerOptions,
+            rootDir: compilerOptions.rootDir || process.cwd(),
+            searchDepthLimit: ruleArguments['search-depth-limit'] || OPTION_SEARCH_DEPTH_LIMIT
+        }, program.getTypeChecker());
+    };
+    Rule.FAILURE_STRING = 'circular import detected';
+    Rule.metadata = {
+        ruleName: 'no-circular-imports',
+        description: 'Disallows circular imports.',
+        rationale: Lint.Utils.dedent(templateObject_1 || (templateObject_1 = __makeTemplateObject(["\n        Circular dependencies cause hard-to-catch runtime exceptions."], ["\n        Circular dependencies cause hard-to-catch runtime exceptions."]))),
+        optionsDescription: Lint.Utils.dedent(templateObject_2 || (templateObject_2 = __makeTemplateObject(["\n      A single argument, ", ", may be provided, and defaults to ", ".\n      It limits the depth of cycle reporting to a fixed size limit for a list of files.\n      This helps improve performance, as most cycles do not surpass a few related files.\n    "], ["\n      A single argument, ", ", may be provided, and defaults to ", ".\n      It limits the depth of cycle reporting to a fixed size limit for a list of files.\n      This helps improve performance, as most cycles do not surpass a few related files.\n    "])), OPTION_SEARCH_DEPTH_LIMIT, OPTION_SEARCH_DEPTH_LIMIT_DEFAULT),
+        options: {
+            properties: (_a = {},
+                _a[OPTION_SEARCH_DEPTH_LIMIT] = {
+                    type: 'number'
+                },
+                _a),
+            type: 'object'
+        },
+        optionExamples: [
+            ['true'],
+            ['true', (_b = {}, _b[OPTION_SEARCH_DEPTH_LIMIT] = 50, _b)]
+        ],
+        type: 'functionality',
+        typescriptOnly: false
+    };
+    return Rule;
+}(Lint.Rules.TypedRule));
+exports.Rule = Rule;
+// Graph of imports.
+var imports = new Map();
+// Keep a list of found circular dependencies to avoid showing them twice.
+var found = new Set();
+var nodeModulesRe = new RegExp("\\" + path_1.sep + "node_modules\\" + path_1.sep);
+function walk(context) {
+    var e_1, _a;
+    // Instead of visiting all children, this is faster. We know imports are statements anyway.
+    context.sourceFile.statements.forEach(function (statement) {
+        // export declarations seem to be missing from the current SyntaxWalker
+        if (ts.isExportDeclaration(statement)) {
+            visitImportOrExportDeclaration(statement);
+        }
+        else if (ts.isImportDeclaration(statement)) {
+            visitImportOrExportDeclaration(statement);
+        }
+    });
+    var fileName = context.sourceFile.fileName;
+    // Check for cycles, remove any cycles that have been found already (otherwise we'll report
+    // false positive on every files that import from the real cycles, and users will be driven
+    // mad).
+    // The checkCycle is many order of magnitude faster than getCycle, but does not keep a history
+    // of the cycle itself. Only get the full cycle if we found one.
+    if (checkCycle(fileName)) {
+        var allCycles = getAllCycles(fileName);
+        try {
+            for (var allCycles_1 = __values(allCycles), allCycles_1_1 = allCycles_1.next(); !allCycles_1_1.done; allCycles_1_1 = allCycles_1.next()) {
+                var maybeCycle = allCycles_1_1.value;
+                // Slice the array so we don't match this file twice.
+                if (maybeCycle.slice(1, -1).some(function (fileName) { return found.has(fileName); })) {
+                    continue;
+                }
+                maybeCycle.forEach(function (x) { return found.add(x); });
+                var node = imports.get(fileName).get(maybeCycle[1]);
+                context.addFailureAt(node.getStart(), node.getWidth(), Rule.FAILURE_STRING + ': ' + maybeCycle
+                    .concat(fileName)
+                    .map(function (x) { return path_1.relative(context.options.rootDir, x); })
+                    .join(' -> '));
+            }
+        }
+        catch (e_1_1) { e_1 = { error: e_1_1 }; }
+        finally {
+            try {
+                if (allCycles_1_1 && !allCycles_1_1.done && (_a = allCycles_1.return)) _a.call(allCycles_1);
+            }
+            finally { if (e_1) throw e_1.error; }
+        }
+    }
+    function visitImportOrExportDeclaration(node) {
+        if (!node.parent || !ts.isSourceFile(node.parent)) {
+            return;
+        }
+        if (!node.moduleSpecifier) {
+            return;
+        }
+        if (!ts.isSourceFile(node.parent)) {
+            return;
+        }
+        var fileName = node.parent.fileName;
+        if (fileName.endsWith('.d.ts')) {
+            return;
+        }
+        if (!ts.isStringLiteral(node.moduleSpecifier)) {
+            return;
+        }
+        var importFileName = node.moduleSpecifier.text;
+        var resolved = ts.resolveModuleName(importFileName, fileName, context.options.compilerOptions, ts.sys);
+        if (!resolved || !resolved.resolvedModule) {
+            return;
+        }
+        var resolvedImportFileName = resolved.resolvedModule.resolvedFileName;
+        // Skip node modules entirely. We use this after resolution to support path mapping in the
+        // tsconfig.json (which could override imports from/to node_modules).
+        if (nodeModulesRe.test(resolvedImportFileName)) {
+            return;
+        }
+        addToGraph(fileName, resolvedImportFileName, node);
+    }
+    function getAllCycles(moduleName, accumulator, iterationDepth) {
+        if (accumulator === void 0) { accumulator = []; }
+        if (iterationDepth === void 0) { iterationDepth = 0; }
+        var e_2, _a, e_3, _b;
+        var moduleImport = imports.get(moduleName);
+        if (!moduleImport)
+            return [];
+        if (accumulator.indexOf(moduleName) !== -1)
+            return [accumulator];
+        if (iterationDepth >= context.options.searchDepthLimit)
+            return [];
+        var all = [];
+        try {
+            for (var _c = __values(Array.from(moduleImport.keys())), _d = _c.next(); !_d.done; _d = _c.next()) {
+                var imp = _d.value;
+                var c = getAllCycles(imp, accumulator.concat(moduleName), iterationDepth + 1);
+                try {
+                    for (var c_1 = __values(c), c_1_1 = c_1.next(); !c_1_1.done; c_1_1 = c_1.next()) {
+                        var cycle = c_1_1.value;
+                        all.push(cycle);
+                    }
+                }
+                catch (e_3_1) { e_3 = { error: e_3_1 }; }
+                finally {
+                    try {
+                        if (c_1_1 && !c_1_1.done && (_b = c_1.return)) _b.call(c_1);
+                    }
+                    finally { if (e_3) throw e_3.error; }
+                }
+            }
+        }
+        catch (e_2_1) { e_2 = { error: e_2_1 }; }
+        finally {
+            try {
+                if (_d && !_d.done && (_a = _c.return)) _a.call(_c);
+            }
+            finally { if (e_2) throw e_2.error; }
+        }
+        return all;
+    }
+}
+function addToGraph(thisFileName, importCanonicalName, node) {
+    var i = imports.get(thisFileName);
+    if (!i) {
+        imports.set(thisFileName, i = new Map);
+    }
+    i.set(importCanonicalName, node);
+}
+function checkCycle(moduleName) {
+    var accumulator = new Set();
+    var moduleImport = imports.get(moduleName);
+    if (!moduleImport)
+        return false;
+    var toCheck = Array.from(moduleImport.keys());
+    for (var i = 0; i < toCheck.length; i++) {
+        var current = toCheck[i];
+        if (current === moduleName) {
+            return true;
+        }
+        accumulator.add(current);
+        toCheck.push.apply(toCheck, __spread(Array.from((imports.get(current) || new Map).keys())
+            .filter(function (i) { return !accumulator.has(i); })));
+    }
+    return false;
+}
+var templateObject_1, templateObject_2;
+//# sourceMappingURL=noCircularImportsRule.js.map
