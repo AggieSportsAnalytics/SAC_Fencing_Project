@@ -221,4 +221,60 @@ async function app() {
   uploadButton.onchange = updateVideo;
 };
 
+let startTime = 0;
+let elapsedTime = 0;
+let currentTime = 0;
+let paused = true;
+let intervalId;
+let mins = 0;
+let secs = 0;
+let milliseconds = 0;
+
+startButton.addEventListener("click", () => {
+  if (paused) {
+      paused = false;
+      startTime = Date.now() - elapsedTime;
+      intervalId = setInterval(updateTime, 1);
+  }
+});
+
+pauseButton.addEventListener("click", () => {
+  if (paused == false) {
+    paused = true;
+    elapsedTime = Date.now() - startTime;
+    clearInterval(intervalId);
+  }
+});
+
+resetButton.addEventListener("click", () => {
+  paused = true;
+  clearInterval(intervalId);
+  startTime = 0;
+  elapsedTime = 0;
+  currentTime = 0;
+  mins = 0;
+  secs = 0;
+  milliseconds = 0;
+
+  timeDisplay.textContent = "00:00:000";
+});
+
+function updateTime() {
+  elapsedTime = Date.now() - startTime;
+
+  mins = Math.floor((elapsedTime / (1000*60)) % 60);
+  secs = Math.floor((elapsedTime / (1000)) % 60);
+  milliseconds = Math.floor((elapsedTime) % 1000);
+
+  mins = padZeroes(mins);
+  secs = padZeroes(secs);
+  milliseconds = padZeroes(milliseconds);
+
+  timeDisplay.textContent = `${mins}:${secs}:${milliseconds}`;
+
+  function padZeroes(unit) {
+    return (("0") + unit).length > 2 ? unit : "0" + unit;
+  }
+}
+
 app();

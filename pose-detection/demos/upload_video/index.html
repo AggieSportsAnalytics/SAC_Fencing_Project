@@ -35,6 +35,31 @@ limitations under the License.
       margin-left: 300px;
       position: relative;
     }
+    .timerButton {
+      width: 80px;
+      height: 30px;
+      border: 3px solid;
+      border-radius: 12px;
+      background-color: #333333;
+      color: white;
+      cursor: pointer;
+      font-family: consolas, monospace;
+    }
+    #timeContainer {
+      text-align: center;
+      border: 3px solid;
+      border-radius: 25px;
+      background-color: #333333;
+      width: 500px;
+      top: 0;
+      right: 100;
+      
+    }
+    #timeDisplay {
+      font-size: 75px;
+      color: #40c437;
+      font-family: consolas, monospace;
+    }
   </style>
 </head>
 <body>
@@ -55,6 +80,13 @@ limitations under the License.
     </div>
     <div class="container">
       <span id="status"></span>
+    </div>
+
+    <div id="timeContainer">
+      <div id="timeDisplay">00:00:000</div>
+        <button id="startButton" class="timerButton">Start</button>
+        <button id="pauseButton" class="timerButton">Pause</button>
+        <button id="resetButton" class="timerButton">Reset</button>
     </div>
   </div>
 </body>
