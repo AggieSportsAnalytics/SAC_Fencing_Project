@@ -221,27 +221,98 @@ async function app() {
   uploadButton.onchange = updateVideo;
 };
 
+//Timer logic starts from here
 let startTime = 0;
 let elapsedTime = 0;
 let currentTime = 0;
+let countdownTime = 0;
+//let started = false;
 let paused = true;
 let intervalId;
 let mins = 0;
 let secs = 0;
 let milliseconds = 0;
 
+let currentInstruction = 0;
+let instructions = [
+  "Perform an en guarde...",
+  "Perform an advance...",
+  "Perform a lunge...",
+  "Peform a defensive stance..."
+];
+
+// startButton.addEventListener("click", () => {
+//   if (paused && started) {
+//     // Timer had been started before, simply restarting the timer
+//       paused = false;
+//       startTime = Date.now() - elapsedTime;
+//       intervalId = setInterval(updateTime, 1);
+//   } else {
+//     // First time timer has been started
+//     started = true;
+//     paused = false;
+//     countdownTime = 3;
+//     timeDisplay.textContent = countdownTime;
+//     intervalId = setInterval(() => {
+//       //timeDisplay.textContent = countdownTime;
+//       if (countdownTime > 1) {
+//         // 1 should be the last number displayed
+//         countdownTime--;
+//         timeDisplay.textContent = countdownTime;
+//       } else {
+//         clearInterval(intervalId);
+//         startTime = Date.now() - elapsedTime;
+//         intervalId = setInterval(updateTime, 1);
+//       }
+//     }, 1000)
+//   }
+// });
+
 startButton.addEventListener("click", () => {
-  if (paused) {
-      paused = false;
-      startTime = Date.now() - elapsedTime;
-      intervalId = setInterval(updateTime, 1);
+  if (paused && currentInstruction < instructions.length) {
+    paused = false;
+
+    instructionDisplay.textContent = instructions[currentInstruction];
+    currentInstruction++;
+
+    countdownTime = 3;
+    timeDisplay.textContent = countdownTime;
+    intervalId = setInterval(() => {
+      if (countdownTime > 1) {
+        // 1 should be the last number displayed
+        countdownTime--;
+        timeDisplay.textContent = countdownTime;
+      } else {
+        // End of countdown, start actual stopwatch
+        clearInterval(intervalId);
+        startTime = Date.now() - elapsedTime;
+        instructionDisplay.textContent += " GO!";
+        intervalId = setInterval(updateTime, 1);
+      }
+    }, 1000)
+  } else {
+    instructionDisplay.textContent = "End of instructions";
   }
 });
 
+// pauseButton.addEventListener("click", () => {
+//   if (paused == false) {
+//     paused = true;
+//     elapsedTime = Date.now() - startTime;
+//     clearInterval(intervalId);
+//   }
+// });
+
 pauseButton.addEventListener("click", () => {
-  if (paused == false) {
+  if (!paused) {
     paused = true;
     elapsedTime = Date.now() - startTime;
+    startTime = 0;
+    elapsedTime = 0;
+    currentTime = 0;
+    mins = 0;
+    secs = 0;
+    milliseconds = 0;
     clearInterval(intervalId);
   }
 });
@@ -255,7 +326,8 @@ resetButton.addEventListener("click", () => {
   mins = 0;
   secs = 0;
   milliseconds = 0;
-
+  currentInstruction = 0;
+  instructionDisplay.textContent = "Awaiting Instruction...";
   timeDisplay.textContent = "00:00:000";
 });
 
@@ -266,14 +338,15 @@ function updateTime() {
   secs = Math.floor((elapsedTime / (1000)) % 60);
   milliseconds = Math.floor((elapsedTime) % 1000);
 
-  mins = padZeroes(mins);
-  secs = padZeroes(secs);
-  milliseconds = padZeroes(milliseconds);
+  mins = padZeroes(mins, 2);
+  secs = padZeroes(secs, 2);
+  milliseconds = padZeroes(milliseconds, 3);
 
   timeDisplay.textContent = `${mins}:${secs}:${milliseconds}`;
 
-  function padZeroes(unit) {
-    return (("0") + unit).length > 2 ? unit : "0" + unit;
+  function padZeroes(unit, desiredLength) {
+    return unit.toString().padStart(desiredLength, "0")
+    // return (("0") + unit).length > desiredLength ? unit : "0" + unit;
   }
 }
 
