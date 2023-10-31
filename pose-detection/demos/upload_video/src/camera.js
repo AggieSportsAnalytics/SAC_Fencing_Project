@@ -67,8 +67,8 @@ export class Context {
   drawKeypoints(keypoints) {
     const keypointInd =
         posedetection.util.getKeypointIndexBySide(params.STATE.model);
-    this.ctx.fillStyle = 'White';
-    this.ctx.strokeStyle = 'White';
+    this.ctx.fillStyle = 'Green';
+    this.ctx.strokeStyle = 'Green';
     this.ctx.lineWidth = params.DEFAULT_LINE_WIDTH;
 
     for (const i of keypointInd.middle) {
@@ -104,8 +104,8 @@ export class Context {
    * @param keypoints A list of keypoints.
    */
   drawSkeleton(keypoints) {
-    this.ctx.fillStyle = 'White';
-    this.ctx.strokeStyle = 'White';
+    this.ctx.fillStyle = 'Green';
+    this.ctx.strokeStyle = 'Green';
     this.ctx.lineWidth = params.DEFAULT_LINE_WIDTH;
 
     posedetection.util.getAdjacentPairs(params.STATE.model).forEach(([
@@ -113,6 +113,10 @@ export class Context {
                                                                     ]) => {
       const kp1 = keypoints[i];
       const kp2 = keypoints[j];
+      
+      console.log("\n");
+      console.log(calculateAngle(keypoints[5], keypoints[7], keypoints[9]));
+      console.log("\n");
 
       // If score is null, just show the keypoint.
       const score1 = kp1.score != null ? kp1.score : 1;
@@ -126,7 +130,41 @@ export class Context {
         this.ctx.stroke();
       }
     });
+
+    function calculateAngle(keypoint1, keypoint2, keypoint3) {
+
+      //Get the x and y coordinates
+
+      //Start coordinates
+      const x1 = keypoint1.x;
+      const y1 = keypoint1.y;
+
+      //Middle coordinates
+      const x2 = keypoint2.x;
+      const y2 = keypoint2.y;
+
+      //End coordinates
+      const x3 = keypoint3.x;
+      const y3 = keypoint3.y;
+
+      var angle = radiansToDegrees(Math.atan2(y3 - y2, x3 - x2) - Math.atan2(y1 - y2, x1 - x2));
+
+      if (angle > 180) {
+        angle = 360-angle;
+      }
+
+      return angle;
+    }
+    
+    
+    function radiansToDegrees(radianAngles) {
+      return Math.abs(radianAngles * (180/Math.PI));
+    }
+    
+
   }
+
+
 
   start() {
     this.mediaRecorder.start();
