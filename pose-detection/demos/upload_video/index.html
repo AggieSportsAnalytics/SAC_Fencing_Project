@@ -53,7 +53,7 @@ limitations under the License.
       width: 500px;
       top: 0;
       right: 100;
-      
+
     }
     #timeDisplay {
       font-size: 75px;
@@ -70,6 +70,13 @@ limitations under the License.
         <label for="videofile">Upload a video file:</label>
         <input type="file" id="videofile" name="video" accept="video/*">
         <button id="submit">Run</button>
+        <div id="timeContainer">
+          <div id="timeDisplay">00:00:000</div>
+          <button id="startButton" class="timerButton">Start</button>
+          <button id="pauseButton" class="timerButton">Stop</button>
+          <button id="resetButton" class="timerButton">Reset</button>
+        </div>
+
       </div>
     </div>
     <div class="container" id="canvas-wrapper">
@@ -82,12 +89,13 @@ limitations under the License.
       <span id="status"></span>
     </div>
 
-    <div id="timeContainer">
+    <h1 id="instructionDisplay">Awaiting Instruction...</h1>
+    <!-- <div id="timeContainer">
       <div id="timeDisplay">00:00:000</div>
-        <button id="startButton" class="timerButton">Start</button>
-        <button id="pauseButton" class="timerButton">Pause</button>
-        <button id="resetButton" class="timerButton">Reset</button>
-    </div>
+      <button id="startButton" class="timerButton">Start</button>
+      <button id="pauseButton" class="timerButton">Pause</button>
+      <button id="resetButton" class="timerButton">Reset</button>
+    </div> -->
   </div>
 </body>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.6/dat.gui.min.js"></script>
