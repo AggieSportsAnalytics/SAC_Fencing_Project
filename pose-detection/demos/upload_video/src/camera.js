@@ -18,6 +18,8 @@ import * as posedetection from '@tensorflow-models/pose-detection';
 
 import * as params from './params';
 
+
+
 export class Context {
   constructor() {
     this.video = document.getElementById('video');
@@ -71,17 +73,33 @@ export class Context {
     this.ctx.strokeStyle = 'Green';
     this.ctx.lineWidth = params.DEFAULT_LINE_WIDTH;
 
-    for (const i of keypointInd.middle) {
-      this.drawKeypoint(keypoints[i]);
-    }
+    // leftArmPoints = [5, 7, 9]
+    // this.ctx.fillStyle = 'Green';
+    // for (const i of leftArmPoints) {
+    //   this.drawKeypoint(keypoints[i]);
+    // }
+    // this.ctx.fillStyle = "Green";
+    // for (const i of keypointInd.left) {
+    //   this.drawKeypoint(keypoints[i]);
+    // }
+
+    // for (const i of keypointInd.middle) {
+    //   this.drawKeypoint(keypoints[i]);
+    // }
+
+    // //this.ctx.fillStyle = 'Orange';
+    // for (const i of keypointInd.right) {
+    //   this.drawKeypoint(keypoints[i]);
+    // }
 
     this.ctx.fillStyle = 'Green';
-    for (const i of keypointInd.left) {
+    for (const i of keypointInd.right) {
       this.drawKeypoint(keypoints[i]);
     }
 
-    this.ctx.fillStyle = 'Orange';
-    for (const i of keypointInd.right) {
+    this.ctx.fillStyle = "Orange";
+    let relevantPts = [6, 8, 10];
+    for (const i of relevantPts) {
       this.drawKeypoint(keypoints[i]);
     }
   }
@@ -93,7 +111,8 @@ export class Context {
 
     if (score >= scoreThreshold) {
       const circle = new Path2D();
-      circle.arc(keypoint.x, keypoint.y, params.DEFAULT_RADIUS, 0, 2 * Math.PI);
+      //circle.arc(keypoint.x, keypoint.y, params.DEFAULT_RADIUS, 0, 2 * Math.PI);
+      circle.arc(keypoint.x, keypoint.y, 10, 0, 2 * Math.PI);
       this.ctx.fill(circle);
       this.ctx.stroke(circle);
     }
@@ -108,14 +127,16 @@ export class Context {
     this.ctx.strokeStyle = 'Green';
     this.ctx.lineWidth = params.DEFAULT_LINE_WIDTH;
 
+
+
     posedetection.util.getAdjacentPairs(params.STATE.model).forEach(([
                                                                       i, j
                                                                     ]) => {
       const kp1 = keypoints[i];
       const kp2 = keypoints[j];
-      
+
       console.log("\n");
-      console.log(calculateAngle(keypoints[5], keypoints[7], keypoints[9]));
+      console.log(calculateAngle(keypoints[6], keypoints[8], keypoints[10]));
       console.log("\n");
 
       // If score is null, just show the keypoint.
@@ -155,12 +176,12 @@ export class Context {
 
       return angle;
     }
-    
-    
+
+
     function radiansToDegrees(radianAngles) {
       return Math.abs(radianAngles * (180/Math.PI));
     }
-    
+
 
   }
 
