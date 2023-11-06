@@ -129,6 +129,37 @@ async function renderResult() {
   }
 }
 
+document.getElementById("startCam").addEventListener("click", () => {
+  const video = document.getElementById("video");
+
+  if (navigator.mediaDevices.getUserMedia) {
+    navigator.mediaDevices
+      .getUserMedia({ video: true })
+      .then((stream) => {
+        video.srcObject = stream;
+      })
+      .catch(function (error) {
+        console.log("Something went wrong!");
+      });
+  }
+});
+
+document.getElementById("stopCam").addEventListener("click", () => {
+  const video = document.getElementById("video");
+
+  const stream = video.srcObject;
+
+  if (stream) {
+    const tracks = stream.getTracks();
+
+    tracks.forEach(function (track) {
+      track.stop();
+    });
+
+    video.srcObject = null;
+  }
+});
+
 async function updateVideo(event) {
   // Clear reference to any previous uploaded video.
   URL.revokeObjectURL(camera.video.currentSrc);
