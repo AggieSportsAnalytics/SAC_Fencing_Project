@@ -130,13 +130,14 @@ async function renderResult() {
 }
 
 document.getElementById("startCam").addEventListener("click", () => {
-  const video = document.getElementById("video");
+  const video = document.getElementById("vid");
 
   if (navigator.mediaDevices.getUserMedia) {
     navigator.mediaDevices
       .getUserMedia({ video: true })
       .then((stream) => {
         video.srcObject = stream;
+        renderResult();
       })
       .catch(function (error) {
         console.log("Something went wrong!");
@@ -145,7 +146,7 @@ document.getElementById("startCam").addEventListener("click", () => {
 });
 
 document.getElementById("stopCam").addEventListener("click", () => {
-  const video = document.getElementById("video");
+  const video = document.getElementById("vid");
 
   const stream = video.srcObject;
 
