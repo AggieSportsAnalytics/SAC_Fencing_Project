@@ -73,14 +73,14 @@ export async function setupDatGui(urlParams) {
 
   showModelConfigs(modelFolder, type);
 
-  modelFolder.open();
+  // modelFolder.open();
 
   backendFolder = gui.addFolder('Backend');
   params.STATE.backend = backendFromURL;
 
   showBackendConfigs(backendFolder);
 
-  backendFolder.open();
+  // backendFolder.open();
 
   return gui;
 }
