@@ -14,16 +14,18 @@ limitations under the License.
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1.0, user-scalable=no">
-  <style>#video {
+  <style>#vid {
       display: block;
       margin: 0 auto;
+      height: 80%;
+      width: 80%;
     }
     .button {
       margin: 5px auto;    
       display: inline-block;
     }
     #instructionDisplay {
-      width: 30%;
+      width: 25%;
       margin: auto;
       position: relative;
       padding: 10px;
@@ -45,7 +47,7 @@ limitations under the License.
       left: 0;
     }
     #top-bar {
-      width: 45%;
+      width: 40%;
       margin: auto;
       position: relative;
     }
@@ -81,26 +83,36 @@ limitations under the License.
     <div class="container">
       <h1 id="instructionDisplay">Awaiting Instruction...</h1>
       <div id="top-bar">
+
+        <!-- live feed -->
         <button class="button" id="startCam">Click Here to Start Cam</button>
         <button class="button" id="stopCam">Click Here to Stop Cam</button>
-        <!-- <label for="videofile">Upload a video file:</label>
+
+        <!-- upload video -->
+        <label for="videofile">Upload a video file:</label>
         <input type="file" id="videofile" name="video" accept="video/*">
-        <button id="submit">Run</button> -->
+        <button id="submit">Run</button>
+
         <div id="timeContainer">
           <div id="timeDisplay">00:00:000</div>
           <button id="startButton" class="timerButton">Start</button>
           <button id="pauseButton" class="timerButton">Stop</button>
           <button id="resetButton" class="timerButton">Reset</button>
         </div>
+
       </div>
-      <video id="video" autoplay=""></video>
     </div>
-    <!-- <div class="container" id="canvas-wrapper"> 
+
+    <!-- pose detection -->
+    <div class="container" id="canvas-wrapper"> 
       <canvas id="output"></canvas>
       <video id="video">
         <source id="currentVID" src="" type="video/mp4">
       </video>
-    </div> -->
+    </div>
+    
+    <video id="vid" autoplay=""></video>
+    
     <div class="container">
       <span id="status"></span>
     </div>
