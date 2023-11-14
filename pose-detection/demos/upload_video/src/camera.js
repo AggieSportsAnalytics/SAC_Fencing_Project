@@ -182,12 +182,12 @@ export class Context {
 
     // Slow down video according to elbow angle; we want to slow it down for
     // moments of extension
-    if (elbowAngle > 135) {
+    if (elbowAngle > 120) {
       this.video.playbackRate = 0.25;
     } else if (elbowAngle > 90) {
-      this.video.playbackRate = 0.75;
+      this.video.playbackRate = 0.5;
     } else {
-      this.video.playbackRate = 2;
+      this.video.playbackRate = 1;
     }
 
 
