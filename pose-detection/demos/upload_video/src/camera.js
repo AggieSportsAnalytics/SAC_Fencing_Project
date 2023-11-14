@@ -177,7 +177,19 @@ export class Context {
     const kp2 = keypoints[8];
     const kp3 = keypoints[10];
     // Gets angle between points, limiting it to two decimal points then putting into string
-    const angleText = "" + this.calculateAngle(kp1, kp2, kp3).toFixed(2);
+    const elbowAngle = this.calculateAngle(kp1, kp2, kp3);
+    const angleText = "" + elbowAngle.toFixed(2);
+
+    // Slow down video according to elbow angle; we want to slow it down for
+    // moments of extension
+    if (elbowAngle > 120) {
+      this.video.playbackRate = 0.25;
+    } else if (elbowAngle > 90) {
+      this.video.playbackRate = 0.5;
+    } else {
+      this.video.playbackRate = 1;
+    }
+
 
     // Place angle text just slightly off of the middle point (kp2)
     const x = kp2.x + 5;
@@ -187,6 +199,9 @@ export class Context {
     const fontsize = 20;
     const fontface = 'roboto';
     this.ctx.font = "bold " + fontsize + 'px ' + fontface;
+
+    this.ctx.fillText("Playback Rate: " + this.video.playbackRate, this.video.videoWidth / 2, 20)
+
     const lineHeight = fontsize * 1.1;
     const textWidth = this.ctx.measureText(angleText).width;
     this.ctx.textAlign = 'left';
