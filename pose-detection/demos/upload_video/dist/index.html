@@ -14,7 +14,10 @@ limitations under the License.
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1.0, user-scalable=no">
-  <style>#vid {
+  <style>#submit {
+      display: none;
+    }
+    #vid {
       display: block;
       margin: 0 auto;
       height: 80%;
@@ -22,7 +25,10 @@ limitations under the License.
     }
     .button {
       margin: 5px auto;    
-      display: inline-block;
+      display: none;
+    }
+    #upload {
+      display: none;
     }
     #instructionDisplay {
       width: 25%;
@@ -89,9 +95,20 @@ limitations under the License.
         <button class="button" id="stopCam">Click Here to Stop Cam</button>
 
         <!-- upload video -->
-        <label for="videofile">Upload a video file:</label>
-        <input type="file" id="videofile" name="video" accept="video/*">
+        <div id="upload">
+          <label for="videofile">Upload a video file:</label>
+          <input type="file" id="videofile" name="video" accept="video/*">
+        </div>
         <button id="submit">Run</button>
+
+        <label for="dropdown"></label>
+        <select id="dropdown" onchange="showSelected()">
+          <option value="option1">Select the video type</option>
+          <option value="option2">Uploaded Video</option>
+          <option value="option3">Live feed</option>
+        </select>
+       
+        <p id="selectedOption">Selected Option: none</p>
 
         <div id="timeContainer">
           <div id="timeDisplay">00:00:000</div>
@@ -101,8 +118,8 @@ limitations under the License.
         </div>
 
       </div>
-    </div>
-
+    </div>    
+  
     <!-- pose detection -->
     <div class="container" id="canvas-wrapper"> 
       <canvas id="output"></canvas>

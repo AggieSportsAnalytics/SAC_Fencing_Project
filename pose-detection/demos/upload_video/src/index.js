@@ -145,6 +145,51 @@ document.getElementById("startCam").addEventListener("click", () => {
   }
 });
 
+document.getElementById("dropdown").addEventListener(("change"), () => {
+  showSelected();
+});
+
+function showSelected() {
+  var dropdown = document.getElementById("dropdown");
+  var selectedOption = document.getElementById("selectedOption");
+  var startCam = document.getElementById("startCam");
+  var stopCam = document.getElementById("stopCam");
+  var upload = document.getElementById("upload");
+  var run = document.getElementById("submit");
+
+  // Get the selected option's text content
+  var selectedText = dropdown.options[dropdown.selectedIndex].text;
+
+  // Display the selected option
+  if(selectedText != "Select the video type")
+  {
+    selectedOption.textContent = "Selected Option: " + selectedText;
+  }
+
+  if(selectedText == "Uploaded Video")
+  {
+    run.style.display = "inline-block";
+    startCam.style.display = "none";
+    stopCam.style.display = "none";
+    upload.style.display = "inline-block";
+  }
+  else if(selectedText == "Live feed")
+  {
+    run.style.display = "inline-block";
+    startCam.style.display = "inline-block";
+    stopCam.style.display = "inline-block";
+    upload.style.display = "none";
+  }
+  else 
+  {
+    selectedOption.textContent = "Selected Option: none";
+    run.style.display = "none";
+    startCam.style.display = "none";
+    stopCam.style.display = "none";
+    upload.style.display = "none";
+  }
+}
+
 document.getElementById("stopCam").addEventListener("click", () => {
   const video = document.getElementById("vid");
 
