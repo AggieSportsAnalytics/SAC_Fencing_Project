@@ -128,7 +128,41 @@ async function renderResult() {
     camera.drawResults(poses);
   }
 }
+// async function renderResult(format) {
+//   // FPS only counts the time it takes to finish estimatePoses.
+//   beginEstimatePosesStats();
 
+//   const poses = await detector.estimatePoses(
+//       format,
+//       {maxPoses: STATE.modelConfig.maxPoses, flipHorizontal: false});
+
+//   endEstimatePosesStats();
+
+//   camera.drawCtx(format);
+
+//   // The null check makes sure the UI is not in the middle of changing to a
+//   // different model. If during model change, the result is from an old
+//   // model, which shouldn't be rendered.
+//   if (poses.length > 0 && !STATE.isModelChanged) {
+//     camera.drawResults(poses, format);
+//   }
+// }
+
+// document.getElementById("startCam").addEventListener("click", () => {
+//   const video = document.getElementById("vid");
+
+//   if (navigator.mediaDevices.getUserMedia) {
+//     navigator.mediaDevices
+//       .getUserMedia({ video: true })
+//       .then((stream) => {
+//         video.srcObject = stream;
+//         renderResult(video);
+//       })
+//       .catch(function (error) {
+//         console.log("Something went wrong!");
+//       });
+//   }
+// });
 document.getElementById("startCam").addEventListener("click", () => {
   const video = document.getElementById("vid");
 
@@ -243,6 +277,19 @@ async function runFrame() {
   await renderResult();
   rafId = requestAnimationFrame(runFrame);
 }
+// async function runFrame(format) {
+//   await checkGuiUpdate();
+//   if (video.paused) {
+//     // video has finished.
+//     camera.mediaRecorder.stop();
+//     camera.clearCtx(format);
+//     camera.video.style.visibility = 'visible';
+//     return;
+//   }
+//   await renderResult(format);
+//   rafId = requestAnimationFrame(runFrame);
+// }
+
 
 async function run() {
   statusElement.innerHTML = 'Warming up model.';
@@ -274,6 +321,47 @@ async function run() {
 
   await runFrame();
 }
+// async function run() {
+//   var dropdown = document.getElementById("dropdown");
+
+//   // Get the selected option's text content
+//   var selectedText = dropdown.options[dropdown.selectedIndex].text;
+//   if(selectedText == "Live feed") {
+//     format = document.getElementById('vid');
+//   }
+//   else {
+//     format = document.getElementById('video');
+//   }
+
+//   statusElement.innerHTML = 'Warming up model.';
+
+//   // Warming up pipeline.
+//   const [runtime, $backend] = STATE.backend.split('-');
+
+//   if (runtime === 'tfjs') {
+//     const warmUpTensor =
+//         tf.fill([camera.video.height, camera.video.width, 3], 0, 'float32');
+//     await detector.estimatePoses(
+//         warmUpTensor,
+//         {maxPoses: STATE.modelConfig.maxPoses, flipHorizontal: false});
+//     warmUpTensor.dispose();
+//     statusElement.innerHTML = 'Model is warmed up.';
+//   }
+
+//   camera.video.style.visibility = 'hidden';
+//   video.pause();
+//   video.currentTime = 0;
+//   video.play();
+//   camera.mediaRecorder.start();
+
+//   await new Promise((resolve) => {
+//     camera.video.onseeked = () => {
+//       resolve(video);
+//     };
+//   });
+
+//   await runFrame(format);
+// }
 
 async function app() {
   // Gui content will change depending on which model is in the query string.
