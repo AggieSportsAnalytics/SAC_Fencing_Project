@@ -17,6 +17,7 @@
     "@tensorflow/tfjs-core": "^4.10.0",
     "@mediapipe/pose": "~0.4.0"
   },
+  
   "scripts": {
     "watch": "cross-env NODE_ENV=development parcel index.html --no-hmr --open",
     "build": "cross-env NODE_ENV=production parcel build index.html --public-url ./",
@@ -42,6 +43,12 @@
     "parcel-plugin-static-files-copy": "^2.5.1",
     "yalc": "~1.0.0-pre.50"
   },
+  "opencv4nodejs": {
+    "disableAutoBuild": 1,
+    "opencvIncludeDir": "/usr/local/Cellar/opencv/4.5.0_5/include",
+    "opencvLibDir": "/usr/local/Cellar/opencv/4.5.0_5/lib",
+    "opencvBinDir": "/usr/local/Cellar/opencv/4.5.0_5/bin"
+  },
   "resolutions": {
     "is-svg": "4.3.1"
   },
@@ -62,4 +69,5 @@
   "eslintIgnore": [
     "dist/"
   ]
+  
 }
