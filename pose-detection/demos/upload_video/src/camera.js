@@ -232,7 +232,6 @@ export class Context {
     this.ctx.fillText(angleText, x, y);
 
   }
-
   // displayAngle(keypoints, format) {
   //   const kp1 = keypoints[6];
   //   const kp2 = keypoints[8];
@@ -273,7 +272,6 @@ export class Context {
   //   this.ctx.fillText(angleText, x, y);
 
   // }
-
 
   calculateAngle(keypoint1, keypoint2, keypoint3) {
     //Start coordinates
