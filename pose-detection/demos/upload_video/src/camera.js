@@ -22,6 +22,8 @@ import * as params from './params';
 
 export class Context {
   constructor() {
+    // this.live = document.getElementById('vid');
+
     this.video = document.getElementById('video');
     this.canvas = document.getElementById('output');
     this.source = document.getElementById('currentVID');
@@ -36,10 +38,17 @@ export class Context {
     this.ctx.drawImage(
         this.video, 0, 0, this.video.videoWidth, this.video.videoHeight);
   }
+  // drawCtx(format) {
+  //   this.ctx.drawImage(
+  //       format, 0, 0, this.video.videoWidth, this.video.videoHeight);
+  // }
 
   clearCtx() {
     this.ctx.clearRect(0, 0, this.video.videoWidth, this.video.videoHeight);
   }
+  // clearCtx(format) {
+  //   this.ctx.clearRect(0, 0, format.videoWidth, format.videoHeight);
+  // }
 
   /**
    * Draw the keypoints and skeleton on the video.
@@ -62,6 +71,17 @@ export class Context {
       this.displayAngle(pose.keypoints);
     }
   }
+  // /**
+  //  * Draw the keypoints and skeleton on the video.
+  //  * @param pose A pose with keypoints to render.
+  //  */
+  //   drawResult(pose) {
+  //     if (pose.keypoints != null) {
+  //       this.drawSkeleton(pose.keypoints);
+  //       this.drawKeypoints(pose.keypoints);
+  //       this.displayAngle(pose.keypoints, format);
+  //     }
+  //   }
 
   /**
    * Draw the keypoints on the video.
@@ -212,6 +232,46 @@ export class Context {
     this.ctx.fillText(angleText, x, y);
 
   }
+  // displayAngle(keypoints, format) {
+  //   const kp1 = keypoints[6];
+  //   const kp2 = keypoints[8];
+  //   const kp3 = keypoints[10];
+  //   // Gets angle between points, limiting it to two decimal points then putting into string
+  //   const elbowAngle = this.calculateAngle(kp1, kp2, kp3);
+  //   const angleText = "" + elbowAngle.toFixed(2);
+
+  //   // Slow down video according to elbow angle; we want to slow it down for
+  //   // moments of extension
+  //   if (elbowAngle > 120) {
+  //     format.playbackRate = 0.25;
+  //   } else if (elbowAngle > 90) {
+  //     format.playbackRate = 0.5;
+  //   } else {
+  //     format.playbackRate = 1;
+  //   }
+
+
+  //   // Place angle text just slightly off of the middle point (kp2)
+  //   const x = kp2.x + 5;
+  //   const y = kp2.y + 10;
+
+  //   // Referenced following StackOverflow guide: https://stackoverflow.com/a/33138692
+  //   const fontsize = 20;
+  //   const fontface = 'roboto';
+  //   this.ctx.font = "bold " + fontsize + 'px ' + fontface;
+
+  //   this.ctx.fillText("Playback Rate: " + format.playbackRate, format.videoWidth / 2, 20)
+
+  //   const lineHeight = fontsize * 1.1;
+  //   const textWidth = this.ctx.measureText(angleText).width;
+  //   this.ctx.textAlign = 'left';
+  //   this.ctx.textBaseline = 'top';
+  //   this.ctx.fillStyle = 'Cyan';
+  //   this.ctx.fillRect(x, y, textWidth, lineHeight);
+  //   this.ctx.fillStyle = 'Black';
+  //   this.ctx.fillText(angleText, x, y);
+
+  // }
 
   calculateAngle(keypoint1, keypoint2, keypoint3) {
     //Start coordinates
