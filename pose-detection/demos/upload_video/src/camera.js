@@ -59,7 +59,7 @@ export class Context {
     if (pose.keypoints != null) {
       this.drawSkeleton(pose.keypoints);
       this.drawKeypoints(pose.keypoints);
-      this.displayAngle(pose.keypoints);
+      this.displayAngles(pose.keypoints);
     }
   }
 
@@ -99,7 +99,7 @@ export class Context {
     // }
 
     this.ctx.fillStyle = "Red";
-    let relevantPts = [6, 8, 10];
+    let relevantPts = [5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
     for (const i of relevantPts) {
       this.drawKeypoint(keypoints[i]);
     }
@@ -128,8 +128,16 @@ export class Context {
     this.ctx.strokeStyle = 'Black';
     this.ctx.lineWidth = 5;//params.DEFAULT_LINE_WIDTH;
 
-    let rightLimbPairs = [[6, 8], [8, 10]]
-    rightLimbPairs.forEach(([i, j]) => {
+    let relevantPairs = [
+                          [6, 8], [8, 10],
+                          [5, 7], [7, 9],
+                          [6, 12], [12, 14],
+                          [5, 11], [11, 13],
+                          [12, 14], [14, 16],
+                          [11, 13], [13, 15]
+                        ];
+
+    relevantPairs.forEach(([i, j]) => {
       const kp1 = keypoints[i];
       const kp2 = keypoints[j];
 
@@ -172,45 +180,58 @@ export class Context {
   }
 
 
-  displayAngle(keypoints) {
-    const kp1 = keypoints[6];
-    const kp2 = keypoints[8];
-    const kp3 = keypoints[10];
-    // Gets angle between points, limiting it to two decimal points then putting into string
-    const elbowAngle = this.calculateAngle(kp1, kp2, kp3);
-    const angleText = "" + elbowAngle.toFixed(2);
-
+  displayAngles(keypoints) {
+    const kptriples = [
+      [5, 7, 9],
+      [6, 8, 10],
+      [6, 12, 14],
+      [5, 11, 13],
+      [12, 14, 16],
+      [11, 13, 15]
+    ]
     // Slow down video according to elbow angle; we want to slow it down for
     // moments of extension
-    if (elbowAngle > 120) {
-      this.video.playbackRate = 0.25;
-    } else if (elbowAngle > 90) {
-      this.video.playbackRate = 0.5;
-    } else {
-      this.video.playbackRate = 1;
-    }
-
-
-    // Place angle text just slightly off of the middle point (kp2)
-    const x = kp2.x + 5;
-    const y = kp2.y + 10;
+    // if (elbowAngle > 120) {
+    //   this.video.playbackRate = 0.25;
+    // } else if (elbowAngle > 90) {
+    //   this.video.playbackRate = 0.5;
+    // } else {
+    //   this.video.playbackRate = 1;
+    // }
 
     // Referenced following StackOverflow guide: https://stackoverflow.com/a/33138692
     const fontsize = 20;
     const fontface = 'roboto';
     this.ctx.font = "bold " + fontsize + 'px ' + fontface;
-
-    this.ctx.fillText("Playback Rate: " + this.video.playbackRate, this.video.videoWidth / 2, 20)
-
     const lineHeight = fontsize * 1.1;
-    const textWidth = this.ctx.measureText(angleText).width;
-    this.ctx.textAlign = 'left';
-    this.ctx.textBaseline = 'top';
-    this.ctx.fillStyle = 'Cyan';
-    this.ctx.fillRect(x, y, textWidth, lineHeight);
-    this.ctx.fillStyle = 'Black';
-    this.ctx.fillText(angleText, x, y);
 
+    // For now, locking playback rate at 0.25
+    this.video.playbackRate = 0.25;
+    this.ctx.fillText("Playback Rate: " + this.video.playbackRate, this.video.videoWidth / 2, 20);
+
+
+    kptriples.forEach((triple) => {
+      const kp1 = keypoints[triple[0]];
+      const kp2 = keypoints[triple[1]];
+      const kp3 = keypoints[triple[2]];
+
+      // Gets angle between points, limiting it to two decimal points then putting into string
+      const elbowAngle = this.calculateAngle(kp1, kp2, kp3);
+      const angleText = "" + elbowAngle.toFixed(2);
+
+      // Place angle text just slightly off of the middle point (kp2)
+      let x = kp2.x + 5;
+      let y = kp2.y + 10;
+
+
+      let textWidth = this.ctx.measureText(angleText).width;
+      this.ctx.textAlign = 'left';
+      this.ctx.textBaseline = 'top';
+      this.ctx.fillStyle = 'Cyan';
+      this.ctx.fillRect(x, y, textWidth, lineHeight);
+      this.ctx.fillStyle = 'Black';
+      this.ctx.fillText(angleText, x, y);
+    });
   }
 
   calculateAngle(keypoint1, keypoint2, keypoint3) {
