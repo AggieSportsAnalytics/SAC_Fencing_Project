@@ -21,6 +21,7 @@ import * as params from './params';
 export class Context {
   constructor() {
     this.video = document.getElementById('video');
+    this.captureStream = new cv.VideoCapture(this.video);
     this.canvas = document.getElementById('output');
     this.source = document.getElementById('currentVID');
     this.ctx = this.canvas.getContext('2d');
@@ -33,6 +34,7 @@ export class Context {
   drawCtx() {
     this.ctx.drawImage(
         this.video, 0, 0, this.video.videoWidth, this.video.videoHeight);
+        
   }
 
   clearCtx() {
