@@ -32,6 +32,9 @@ export class Context {
     const options = {mimeType: 'video/webm; codecs=vp9'};
     this.mediaRecorder = new MediaRecorder(stream, options);
     this.mediaRecorder.ondataavailable = this.handleDataAvailable;
+
+    this.prevPoint = {x: 0, y: 0};
+    this.frameCount = 0;
   }
 
   drawCtx() {
@@ -66,22 +69,12 @@ export class Context {
    */
   drawResult(pose) {
     if (pose.keypoints != null) {
+      this.frameCount += 1
       this.drawSkeleton(pose.keypoints);
       this.drawKeypoints(pose.keypoints);
       this.displayAngles(pose.keypoints);
     }
   }
-  // /**
-  //  * Draw the keypoints and skeleton on the video.
-  //  * @param pose A pose with keypoints to render.
-  //  */
-  //   drawResult(pose) {
-  //     if (pose.keypoints != null) {
-  //       this.drawSkeleton(pose.keypoints);
-  //       this.drawKeypoints(pose.keypoints);
-  //       this.displayAngle(pose.keypoints, format);
-  //     }
-  //   }
 
   /**
    * Draw the keypoints on the video.
@@ -90,40 +83,21 @@ export class Context {
   drawKeypoints(keypoints) {
     const keypointInd =
         posedetection.util.getKeypointIndexBySide(params.STATE.model);
-    // this.ctx.fillStyle = 'Red';
     this.ctx.strokeStyle = 'Red';
     this.ctx.lineWidth = params.DEFAULT_LINE_WIDTH;
-
-    // leftArmPoints = [5, 7, 9]
-    // this.ctx.fillStyle = 'Green';
-    // for (const i of leftArmPoints) {
-    //   this.drawKeypoint(keypoints[i]);
-    // }
-    // this.ctx.fillStyle = "Green";
-    // for (const i of keypointInd.left) {
-    //   this.drawKeypoint(keypoints[i]);
-    // }
-
-    // for (const i of keypointInd.middle) {
-    //   this.drawKeypoint(keypoints[i]);
-    // }
-
-    // //this.ctx.fillStyle = 'Orange';
-    // for (const i of keypointInd.right) {
-    //   this.drawKeypoint(keypoints[i]);
-    // }
-
-    // this.ctx.fillStyle = 'Green';
-    // for (const i of keypointInd.right) {
-    //   this.drawKeypoint(keypoints[i]);
-    // }
 
     this.ctx.fillStyle = "Red";
     let relevantPts = [5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
     for (const i of relevantPts) {
       this.drawKeypoint(keypoints[i]);
+
+      if (i === 6 && !(this.frameCount % 5)) {
+        console.log(keypoints[i].x - this.prevPoint.x);
+        this.prevPoint = keypoints[i];
+      }
     }
   }
+
 
   drawKeypoint(keypoint) {
     // If score is null, just show the keypoint.
@@ -174,29 +148,6 @@ export class Context {
       }
 
     });
-
-    // posedetection.util.getAdjacentPairs(params.STATE.model).forEach(([
-    //                                                                   i, j
-    //                                                                 ]) => {
-    //   const kp1 = keypoints[i];
-    //   const kp2 = keypoints[j];
-
-    //   console.log("\n");
-    //   console.log(calculateAngle(keypoints[6], keypoints[8], keypoints[10]));
-    //   console.log("\n");
-
-    //   // If score is null, just show the keypoint.
-    //   const score1 = kp1.score != null ? kp1.score : 1;
-    //   const score2 = kp2.score != null ? kp2.score : 1;
-    //   const scoreThreshold = params.STATE.modelConfig.scoreThreshold || 0;
-
-    //   if (score1 >= scoreThreshold && score2 >= scoreThreshold) {
-    //     this.ctx.beginPath();
-    //     this.ctx.moveTo(kp1.x, kp1.y);
-    //     this.ctx.lineTo(kp2.x, kp2.y);
-    //     this.ctx.stroke();
-    //   }
-    // });
   }
 
 
@@ -209,15 +160,6 @@ export class Context {
       [12, 14, 16],
       [11, 13, 15]
     ]
-    // Slow down video according to elbow angle; we want to slow it down for
-    // moments of extension
-    // if (elbowAngle > 120) {
-    //   this.video.playbackRate = 0.25;
-    // } else if (elbowAngle > 90) {
-    //   this.video.playbackRate = 0.5;
-    // } else {
-    //   this.video.playbackRate = 1;
-    // }
 
     // Referenced following StackOverflow guide: https://stackoverflow.com/a/33138692
     const fontsize = 20;
@@ -225,9 +167,10 @@ export class Context {
     this.ctx.font = "bold " + fontsize + 'px ' + fontface;
     const lineHeight = fontsize * 1.1;
 
-    // For now, locking playback rate at 0.25
-    this.video.playbackRate = 0.25;
-    this.ctx.fillText("Playback Rate: " + this.video.playbackRate, this.video.videoWidth / 2, 20);
+    // // For now, locking playback rate at 0.25
+    // this.video.playbackRate = 0.25;
+    // this.ctx.fillText("Playback Rate: " + this.video.playbackRate, this.video.videoWidth / 2, 20);
+
 
 
     kptriples.forEach((triple) => {
@@ -236,8 +179,21 @@ export class Context {
       const kp3 = keypoints[triple[2]];
 
       // Gets angle between points, limiting it to two decimal points then putting into string
-      const elbowAngle = this.calculateAngle(kp1, kp2, kp3);
-      const angleText = "" + elbowAngle.toFixed(2);
+      const jointAngle = this.calculateAngle(kp1, kp2, kp3);
+      const angleText = "" + jointAngle.toFixed(2);
+
+      // Dynamically adjust speed of playback, based on elbow angle only
+      if (triple[1] === 8) {
+        if (jointAngle > 120) {
+          this.video.playbackRate = 0.25;
+        } else if (jointAngle > 90) {
+          this.video.playbackRate = 0.5;
+        } else {
+          this.video.playbackRate = 1;
+        }
+        this.ctx.fillText("Playback Rate: " + this.video.playbackRate, this.video.videoWidth / 2, 20);
+      }
+
 
       // Place angle text just slightly off of the middle point (kp2)
       let x = kp2.x + 5;
@@ -253,46 +209,6 @@ export class Context {
       this.ctx.fillText(angleText, x, y);
     });
   }
-  // displayAngle(keypoints, format) {
-  //   const kp1 = keypoints[6];
-  //   const kp2 = keypoints[8];
-  //   const kp3 = keypoints[10];
-  //   // Gets angle between points, limiting it to two decimal points then putting into string
-  //   const elbowAngle = this.calculateAngle(kp1, kp2, kp3);
-  //   const angleText = "" + elbowAngle.toFixed(2);
-
-  //   // Slow down video according to elbow angle; we want to slow it down for
-  //   // moments of extension
-  //   if (elbowAngle > 120) {
-  //     format.playbackRate = 0.25;
-  //   } else if (elbowAngle > 90) {
-  //     format.playbackRate = 0.5;
-  //   } else {
-  //     format.playbackRate = 1;
-  //   }
-
-
-  //   // Place angle text just slightly off of the middle point (kp2)
-  //   const x = kp2.x + 5;
-  //   const y = kp2.y + 10;
-
-  //   // Referenced following StackOverflow guide: https://stackoverflow.com/a/33138692
-  //   const fontsize = 20;
-  //   const fontface = 'roboto';
-  //   this.ctx.font = "bold " + fontsize + 'px ' + fontface;
-
-  //   this.ctx.fillText("Playback Rate: " + format.playbackRate, format.videoWidth / 2, 20)
-
-  //   const lineHeight = fontsize * 1.1;
-  //   const textWidth = this.ctx.measureText(angleText).width;
-  //   this.ctx.textAlign = 'left';
-  //   this.ctx.textBaseline = 'top';
-  //   this.ctx.fillStyle = 'Cyan';
-  //   this.ctx.fillRect(x, y, textWidth, lineHeight);
-  //   this.ctx.fillStyle = 'Black';
-  //   this.ctx.fillText(angleText, x, y);
-
-  // }
 
   calculateAngle(keypoint1, keypoint2, keypoint3) {
     //Start coordinates
