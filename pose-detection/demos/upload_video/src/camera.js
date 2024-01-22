@@ -17,9 +17,6 @@
 import * as posedetection from '@tensorflow-models/pose-detection';
 
 import * as params from './params';
-import addUserAngle from '../backend/index'
-
-
 
 export class Context {
   constructor() {
@@ -33,9 +30,10 @@ export class Context {
     this.mediaRecorder.ondataavailable = this.handleDataAvailable;
   }
 
+userAngleNumber = 0;
 userAngles = {
-    _id: 0, 
-    name: '', 
+    _id: null, 
+    name: null, 
     elbow_left: null,
     hip_left: null,
     knee_left: null, 
@@ -231,7 +229,8 @@ userAngles = {
       const elbowAngle = this.calculateAngle(kp1, kp2, kp3);      
       const angleText = "" + elbowAngle.toFixed(2);
 
-      this.userAngles._id = ++_id;
+      //id code is being weird
+      this.userAngles._id = ++this.userAngleNumber;
       if(triple == [5, 7, 9]) { this.userAngles.elbow_left = elbowAngle; }
       else if(triple == [6, 8, 10]) { this.userAngles.elbow_right = elbowAngle; }
       else if(triple == [6, 12, 14]) { this.userAngles.hip_left = elbowAngle; }
@@ -292,8 +291,30 @@ userAngles = {
   inputToDB(pose) {
     if(pose != "Pause") {
       this.userAngles.name = pose;
-      addUserAngle(this.userAngles).catch(console.dir);
+      // this.handleAnglesUpload(this.userAngles);
     }
+  }
+
+  async handleAnglesUpload(document) {
+    try {
+      const response = await fetch('http://localhost:3000/api/angles', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ _id: document._id, name: document.name, elbow_left: document.elbow_left, hip_left: document.hip_left, knee_left: document.knee_left, elbow_right: document.elbow_right, hip_right: document.hip_right, knee_right: document.knee_right }),
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return await response.json(); // Returns the added course with _id
+    } catch (error) {
+      console.error("Could not add the course to the database", error);
+    }
+  }
+
+  getUserAngles() {
+    return this.userAngles;
   }
 
   handleDataAvailable(event) {

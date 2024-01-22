@@ -14,7 +14,15 @@ limitations under the License.
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1.0, user-scalable=no">
-  <style>#submit {
+  <style>#feedback {
+      width: 40%;
+      margin: auto;
+      position: relative;
+      padding-top: 1%;
+      padding-left: 20%;
+      padding-right: 20%;
+    }
+    #submit {
       display: none;
     }
     #vid {
@@ -103,7 +111,7 @@ limitations under the License.
         <button id="submit">Run</button>
 
         <label for="dropdown"></label>
-        <select id="dropdown" onchange="showSelected()">
+        <select id="dropdown">
           <option value="option1">Select the video type</option>
           <option value="option2">Uploaded Video</option>
           <option value="option3">Live feed</option>
@@ -120,6 +128,8 @@ limitations under the License.
 
       </div>
     </div>    
+
+    <p id="feedback">Feedback on pose will be displayed here...</p>
   
     <!-- pose detection -->
     <div class="container" id="canvas-wrapper"> 
@@ -146,5 +156,5 @@ limitations under the License.
 </body>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.6/dat.gui.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/stats.js/r16/Stats.min.js"></script>
-<script src="/1fdf421c05c1140f6d71444ea2b27638.js"></script>
+<script src="/src.a2b27638.js"></script>
 </html>

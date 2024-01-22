@@ -21,11 +21,7 @@ import * as mpPose from '@mediapipe/pose';
 
 import * as tfjsWasm from '@tensorflow/tfjs-backend-wasm';
 
-import inputToDB from './camera'
-
-tfjsWasm.setWasmPaths(
-    `https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm@${
-        tfjsWasm.version_wasm}/dist/`);
+import { inputToDB } from './camera'
 
 import * as posedetection from '@tensorflow-models/pose-detection';
 import * as tf from '@tensorflow/tfjs-core';
@@ -41,6 +37,8 @@ let startInferenceTime, numInferences = 0;
 let inferenceTimeSum = 0, lastPanelUpdate = 0;
 let rafId;
 const statusElement = document.getElementById('status');
+
+let secCheck = -1;
 
 async function createDetector() {
   switch (STATE.model) {
@@ -489,6 +487,17 @@ function updateTime() {
   function padZeroes(unit, desiredLength) {
     return unit.toString().padStart(desiredLength, "0")
     // return (("0") + unit).length > desiredLength ? unit : "0" + unit;
+  }
+
+  if(secs % 3 == 0 && secs != 0 && secCheck != secs) {
+    if (!paused) {
+      secCheck = secs;
+      video.pause();
+      paused = true;
+      clearInterval(intervalId);
+      totalTime = video.currentTime;
+      inputToDB(detectPoseDB());
+    }
   }
 }
 

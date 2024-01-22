@@ -17,7 +17,8 @@
     "@tensorflow/tfjs-converter": "^4.10.0",
     "@tensorflow/tfjs-core": "^4.10.0",
     "@types/node": "^20.9.0",
-    "mongodb": "^6.3.0"
+    "mongodb": "^6.3.0",
+    "openai": "^4.24.7"
   },
   "scripts": {
     "watch": "cross-env NODE_ENV=development parcel index.html --no-hmr --open",
