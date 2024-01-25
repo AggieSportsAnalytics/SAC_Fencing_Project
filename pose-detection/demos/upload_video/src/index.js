@@ -21,7 +21,7 @@ import * as mpPose from '@mediapipe/pose';
 
 import * as tfjsWasm from '@tensorflow/tfjs-backend-wasm';
 
-import { inputToDB } from './camera'
+import { inputToDB, getUserAngles } from './camera'
 
 import * as posedetection from '@tensorflow-models/pose-detection';
 import * as tf from '@tensorflow/tfjs-core';
@@ -37,6 +37,7 @@ let startInferenceTime, numInferences = 0;
 let inferenceTimeSum = 0, lastPanelUpdate = 0;
 let rafId;
 const statusElement = document.getElementById('status');
+let angles;
 
 let secCheck = -1;
 
@@ -150,23 +151,23 @@ document.getElementById("dropdown").addEventListener(("change"), () => {
 });
 
 function showSelected() {
-  var dropdown = document.getElementById("dropdown");
-  var selectedOption = document.getElementById("selectedOption");
-  var startCam = document.getElementById("startCam");
-  var stopCam = document.getElementById("stopCam");
-  var upload = document.getElementById("upload");
-  var run = document.getElementById("submit");
+  let dropdown = document.getElementById("dropdown");
+  let selectedOption = document.getElementById("selectedOption");
+  let startCam = document.getElementById("startCam");
+  let stopCam = document.getElementById("stopCam");
+  let upload = document.getElementById("upload");
+  let run = document.getElementById("submit");
 
   // Get the selected option's text content
-  var selectedText = dropdown.options[dropdown.selectedIndex].text;
+  let selectedText = dropdown.options[dropdown.selectedIndex].text;
 
   // Display the selected option
   if(selectedText != "Select the video type")
   {
-    selectedOption.textContent = "Selected Option: " + selectedText;
+    // selectedOption.textContent = "Selected Option: " + selectedText;
   }
 
-  if(selectedText == "Uploaded Video")
+  if(selectedText === "Uploaded Video")
   {
     // run.style.display = "inline-block";
     run.style.display = "none";
@@ -174,7 +175,7 @@ function showSelected() {
     stopCam.style.display = "none";
     upload.style.display = "inline-block";
   }
-  else if(selectedText == "Live feed")
+  else if(selectedText === "Live feed")
   {
     // run.style.display = "inline-block";
     run.style.display = "none";
@@ -184,7 +185,7 @@ function showSelected() {
   }
   else 
   {
-    selectedOption.textContent = "Selected Option: none";
+    // selectedOption.textContent = "Selected Option: none";
     run.style.display = "none";
     startCam.style.display = "none";
     stopCam.style.display = "none";
@@ -412,7 +413,9 @@ pauseButton.addEventListener("click", () => {
     milliseconds = 0;
     clearInterval(intervalId);
     totalTime = video.currentTime;
-    inputToDB(detectPoseDB());
+    camera.inputToDB(detectPoseDB());
+    console.log("Paused");
+    getAnglesFromMongo();
   }
 });
 
@@ -423,22 +426,23 @@ function detectPoseDB() {
   // En guarde, 26, 33
   // pause, 29, 32, 36, 39
 
-  if (instructions[currentInstruction] == "Perform a slow advance..." || 
-  instructions[currentInstruction] == "Perform a slow advance..." ||
-  instructions[currentInstruction] == "Perform an advance...") {
+  if (instructions[currentInstruction] === "Perform a slow advance..." || 
+  instructions[currentInstruction] === "Perform a slow advance..." ||
+  instructions[currentInstruction] === "Perform an advance...") {
     return "Advance";
   }
-  else if (instructions[currentInstruction] == "Perform a slow retreat..." || 
-  instructions[currentInstruction] == "Perform a slow retreat..." ||
-  instructions[currentInstruction] == "Perform a retreat...") {
+  else if (instructions[currentInstruction] === "Perform a slow retreat..." || 
+  instructions[currentInstruction] === "Perform a slow retreat..." ||
+  instructions[currentInstruction] === "Perform a retreat...") {
     return "Retreat";
   }
-  if (instructions[currentInstruction] == "Pause...") {
+  else if (instructions[currentInstruction] === "Pause...") {
     return "Pause";
   }
-  if (instructions[currentInstruction] == "Perform an En guarde...") {
+  else if (instructions[currentInstruction] === "Perform an En guarde...") {
     return "En-Guarde";
   }    
+  return "none";
 
   // if(currentInstruction <= 7) { return "Advance"; }
   // else if(currentInstruction <= 15) { return "Retreat"; }
@@ -489,16 +493,74 @@ function updateTime() {
     // return (("0") + unit).length > desiredLength ? unit : "0" + unit;
   }
 
-  if(secs % 3 == 0 && secs != 0 && secCheck != secs) {
+  if(secs % 3 === 0 && secs != 0 && secCheck != secs) {
     if (!paused) {
       secCheck = secs;
       video.pause();
       paused = true;
       clearInterval(intervalId);
       totalTime = video.currentTime;
-      inputToDB(detectPoseDB());
+      document.getElementById("feedback").textContent = "Generating feedback, please wait...";
+      camera.inputToDB(detectPoseDB());
+      angles = camera.getUserAngles();
+      fetchComparisonData(camera.getUserAngles());
     }
   }
 }
+
+function showGPT(response) {
+  let feedback = document.getElementById("feedback");
+  feedback.textContent = response;
+}
+
+function fetchComparisonData(userAngles) {
+  fetch('http://localhost:3000/api/gpt', {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(userAngles),
+  })
+  .then(response => response.json())
+  .then(data => {
+      console.log('Success:', data.message);
+      showGPT(data.message);
+  })
+  .catch((error) => {
+      console.error('Error:', error);
+  });
+}
+
+// const getAnglesFromMongo = async () => {
+//   try {
+//     const response = await fetch('http://localhost:3000/api/angles');
+//     const data = await response.json();
+
+//     // Check if data is an array before setting state
+//     if (Array.isArray(data)) {
+//       setHomeworks(data);
+//     } else {
+//       console.error('Expected an array, but received:', data);
+//     }
+//   } catch (error) {
+//     console.error('Error fetching angles:', error);
+//   }
+// };
+
+// const getGPT = async () => {
+//   try {
+//     const response = await fetch('http://localhost:3000/api/gpt');
+//     const data = await response.json();
+
+//     // Check if data is an array before setting state
+//     if (Array.isArray(data)) {
+//       setHomeworks(data);
+//     } else {
+//       console.error('Expected an array, but received:', data);
+//     }
+//   } catch (error) {
+//     console.error('Error fetching angles:', error);
+//   }
+// };
 
 app();

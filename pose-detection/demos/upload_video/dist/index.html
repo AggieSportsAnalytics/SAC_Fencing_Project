@@ -15,12 +15,13 @@ limitations under the License.
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1.0, user-scalable=no">
   <style>#feedback {
-      width: 40%;
-      margin: auto;
-      position: relative;
-      padding-top: 1%;
-      padding-left: 20%;
-      padding-right: 20%;
+      /* width: 80%; */
+      /* margin-left: 100px; */
+      padding-left: 10%;
+      padding-right: 10%;
+      text-align: center;
+      /* position: relative; */
+      padding-top: 10px;
     }
     #submit {
       display: none;
@@ -35,18 +36,35 @@ limitations under the License.
     .button {
       margin: 5px auto;    
       display: none;
+      background-color: #FFFFFF;
+      border-radius: 8px;
+      border-width: 1px;
+      cursor: pointer;
+    }
+    .button:hover {
+      background-color: #f0f0f0; 
+    }
+    .live {
+      text-align: center;
     }
     #upload {
       display: none;
+      padding-bottom: 5px;
+    }
+    .up {
+      text-align: center;
+      /* margin-left: 70px; */
     }
     #instructionDisplay {
-      width: 25%;
+      /* width: 25%; */
+      text-align: center;
       margin: auto;
       position: relative;
       padding: 10px;
     }
     body {
       margin: 0;
+      background-color: antiquewhite;
     }
     #main {
       margin: 0;
@@ -82,14 +100,41 @@ limitations under the License.
       border-radius: 25px;
       background-color: #333333;
       width: 500px;
-      top: 0;
-      right: 100;
-
+      margin-left: 35px;
+      /* top: 0; */
+      /* justify-content: center; */
     }
     #timeDisplay {
       font-size: 75px;
       color: #40c437;
       font-family: consolas, monospace;
+    }
+    #dropdown {
+      border-radius: 8px;
+      background-color: #FFFFFF;
+      border-width: 1px;
+      cursor: pointer;
+    }
+    /* .select {
+      text-align: center;
+    } */
+    .select {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px; 
+      padding-bottom: 5px;
+    }
+    .custom-file-upload {
+      background-color: white;
+      border: 1px solid;
+      border-radius: 8px; 
+      padding: 0px 10px;
+      cursor: pointer;
+      display: inline-block;
+    }
+    .custom-file-upload:hover {
+      background-color: #f0f0f0; 
     }</style>
 </head>
 <body>
@@ -99,25 +144,36 @@ limitations under the License.
       <h1 id="instructionDisplay">Awaiting Instruction...</h1>
       <div id="top-bar">
 
-        <!-- live feed -->
-        <button class="button" id="startCam">Click Here to Start Cam</button>
-        <button class="button" id="stopCam">Click Here to Stop Cam</button>
-
-        <!-- upload video -->
-        <div id="upload">
-          <label for="videofile">Upload a video file:</label>
-          <input type="file" id="videofile" name="video" accept="video/*">
+        <div class="select">
+          <label for="dropdown"></label>
+          <select id="dropdown">
+            <option value="option1">Select the video type</option>
+            <option value="option2">Uploaded Video</option>
+            <option value="option3">Live feed</option>
+          </select>
+          <p id="selectedOption"></p>
         </div>
-        <button id="submit">Run</button>
 
-        <label for="dropdown"></label>
-        <select id="dropdown">
-          <option value="option1">Select the video type</option>
-          <option value="option2">Uploaded Video</option>
-          <option value="option3">Live feed</option>
-        </select>
-       
-        <p id="selectedOption">Selected Option: none</p>
+        <!-- live feed -->
+        <div class="live">
+          <button class="button" id="startCam">Click Here to Start Cam</button>
+          <button class="button" id="stopCam">Click Here to Stop Cam</button>
+        </div>
+        <!-- upload video -->
+        <!-- <div class="up">
+          <div id="upload">
+            <label for="videofile"></label>
+            <input type="file" id="videofile" name="video" accept="video/*">
+          </div>
+          <button id="submit">Run</button>
+        </div> -->
+        <div class="up">
+          <div id="upload">
+            <input type="file" id="videofile" name="video" accept="video/*" style="display: none;">
+            <label for="videofile" class="custom-file-upload">Choose File</label>
+          </div>
+          <button id="submit">Run</button>
+        </div>
 
         <div id="timeContainer">
           <div id="timeDisplay">00:00:000</div>

@@ -32,7 +32,7 @@ export class Context {
 
 userAngleNumber = 0;
 userAngles = {
-    _id: null, 
+    // _id: 0, 
     name: null, 
     elbow_left: null,
     hip_left: null,
@@ -229,14 +229,15 @@ userAngles = {
       const elbowAngle = this.calculateAngle(kp1, kp2, kp3);      
       const angleText = "" + elbowAngle.toFixed(2);
 
-      //id code is being weird
-      this.userAngles._id = ++this.userAngleNumber;
-      if(triple == [5, 7, 9]) { this.userAngles.elbow_left = elbowAngle; }
-      else if(triple == [6, 8, 10]) { this.userAngles.elbow_right = elbowAngle; }
-      else if(triple == [6, 12, 14]) { this.userAngles.hip_left = elbowAngle; }
-      else if(triple == [5, 11, 13]) { this.userAngles.hip_right = elbowAngle; }
-      else if(triple == [12, 14, 16]) { this.userAngles.knee_left = elbowAngle; }
-      else if(triple == [11, 13, 15]) { this.userAngles.knee_right = elbowAngle; }
+      //FIXME: if statements
+      if(triple[0] === 5 && triple[1] === 7 && triple[2] === 9) { this.userAngles.elbow_left = elbowAngle; }
+      else if(triple[0] === 6 && triple[1] === 8 && triple[2] === 10) { this.userAngles.elbow_right = elbowAngle; }
+      else if(triple[0] === 6 && triple[1] === 12 && triple[2] === 14) { this.userAngles.hip_left = elbowAngle; }
+      else if(triple[0] === 5 && triple[1] === 11 && triple[2] === 13) { this.userAngles.hip_right = elbowAngle; }
+      else if(triple[0] === 12 && triple[1] === 14 && triple[2] === 16) { this.userAngles.knee_left = elbowAngle; }
+      else if(triple[0] === 11 && triple[1] === 13 && triple[2] === 15) { this.userAngles.knee_right = elbowAngle; }
+      // console.log(`Triple: ${triple}`);
+      // console.log(`Angle: ${elbowAngle}\nUpdated Angle: ${this.userAngles.elbow_left}`);
 
       // Place angle text just slightly off of the middle point (kp2)
       let x = kp2.x + 5;
@@ -291,7 +292,7 @@ userAngles = {
   inputToDB(pose) {
     if(pose != "Pause") {
       this.userAngles.name = pose;
-      // this.handleAnglesUpload(this.userAngles);
+      this.handleAnglesUpload(this.userAngles);
     }
   }
 
@@ -302,8 +303,9 @@ userAngles = {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ _id: document._id, name: document.name, elbow_left: document.elbow_left, hip_left: document.hip_left, knee_left: document.knee_left, elbow_right: document.elbow_right, hip_right: document.hip_right, knee_right: document.knee_right }),
+        body: JSON.stringify({ name: document.name, elbow_left: document.elbow_left, hip_left: document.hip_left, knee_left: document.knee_left, elbow_right: document.elbow_right, hip_right: document.hip_right, knee_right: document.knee_right }),
       });
+      console.log("Handling upload");
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
