@@ -9,13 +9,16 @@
     "node": ">=8.9.0"
   },
   "dependencies": {
+    "@mediapipe/pose": "~0.4.0",
     "@tensorflow-models/pose-detection": "file:../../dist",
     "@tensorflow/tfjs-backend-wasm": "^4.10.0",
     "@tensorflow/tfjs-backend-webgl": "^4.10.0",
     "@tensorflow/tfjs-backend-webgpu": "^4.10.0",
     "@tensorflow/tfjs-converter": "^4.10.0",
     "@tensorflow/tfjs-core": "^4.10.0",
-    "@mediapipe/pose": "~0.4.0"
+    "@types/node": "^20.9.0",
+    "mongodb": "^6.3.0",
+    "openai": "^4.24.7"
   },
   "scripts": {
     "watch": "cross-env NODE_ENV=development parcel index.html --no-hmr --open",
@@ -36,10 +39,10 @@
     "babel-preset-env": "^1.7.0",
     "clang-format": "~1.2.2",
     "cross-env": "^5.2.0",
-    "eslint": "^4.19.1",
+    "eslint": "^8.56.0",
     "eslint-config-google": "^0.9.1",
     "parcel-bundler": "1.12.5",
-    "parcel-plugin-static-files-copy": "^2.5.1",
+    "parcel-plugin-static-files-copy": "^1.2.4",
     "yalc": "~1.0.0-pre.50"
   },
   "resolutions": {
