@@ -133,11 +133,13 @@ async function compareAngles(user_angles) {
 
     const completion = await openai.chat.completions.create({
         model: "gpt-3.5-turbo",
-        messages: messages
+        messages: messages,
+        stream: true,
     });
-
+    // const stream = OpenAIStream(completion);
     // return completion.choices[0].message.content;
-    console.log(completion.choices[0].message.content);
+    // console.log(completion.choices[0].message.content);
 
     return completion.choices[0].message.content;
+    // return new StreamingTextResponse(stream);
 }
