@@ -219,7 +219,6 @@ userAngles = {
     this.video.playbackRate = 0.25;
     this.ctx.fillText("Playback Rate: " + this.video.playbackRate, this.video.videoWidth / 2, 20);
 
-
     kptriples.forEach((triple) => {
       const kp1 = keypoints[triple[0]];
       const kp2 = keypoints[triple[1]];
