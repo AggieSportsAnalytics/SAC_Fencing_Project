@@ -427,12 +427,12 @@ function detectPoseDB() {
   // pause, 29, 32, 36, 39
 
   if (instructions[currentInstruction] === "Perform a slow advance..." || 
-  instructions[currentInstruction] === "Perform a slow advance..." ||
+  instructions[currentInstruction] === "Perform a quick advance..." ||
   instructions[currentInstruction] === "Perform an advance...") {
     return "Advance";
   }
   else if (instructions[currentInstruction] === "Perform a slow retreat..." || 
-  instructions[currentInstruction] === "Perform a slow retreat..." ||
+  instructions[currentInstruction] === "Perform a quick retreat..." ||
   instructions[currentInstruction] === "Perform a retreat...") {
     return "Retreat";
   }
