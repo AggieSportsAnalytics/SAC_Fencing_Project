@@ -14,7 +14,12 @@ limitations under the License.
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1.0, user-scalable=no">
-  <style>#feedback {
+  <style>.resized-video, .resized-canvas {
+      width: 66.66%; 
+      height: auto;
+      padding-left: 50px;
+    }
+    #feedback {
       /* width: 80%; */
       /* margin-left: 100px; */
       padding-left: 10%;
@@ -22,6 +27,24 @@ limitations under the License.
       text-align: center;
       /* position: relative; */
       padding-top: 10px;
+    }
+    .vidtimings {
+      display: flex;
+      align-items: center; 
+      justify-content: center;
+    }
+    .timings {
+      margin-left: 5%;
+      padding-left: 10px;
+      padding-right: 10px;
+      width: 200px;
+      height: 500px;
+      border-color: black;
+      border-radius: 10px;
+      border: 3px solid;
+      text-align: center;
+      overflow-wrap: break-word;
+      overflow-y: auto;
     }
     #submit {
       display: none;
@@ -186,13 +209,19 @@ limitations under the License.
     </div>    
 
     <p id="feedback">Feedback on pose will be displayed here...</p>
-  
-    <!-- pose detection -->
-    <div class="container" id="canvas-wrapper"> 
-      <canvas id="output"></canvas>
-      <video id="video">
-        <source id="currentVID" src="" type="video/mp4">
-      </video>
+    
+    <div class="vidtimings">
+      <div class="timings" id="timings">
+        <p id="time">The times it took to perform each pose will be listed below</p>
+      </div>
+
+      <!-- pose detection -->
+      <div class="container" id="canvas-wrapper"> 
+        <canvas id="output"></canvas>
+        <video id="video" style="padding-left: 50px;">
+          <source id="currentVID" type="video/mp4">
+        </video>
+      </div>
     </div>
     
     <video id="vid" autoplay=""></video>

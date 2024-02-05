@@ -1,6 +1,5 @@
 const express = require('express');
 const cors = require('cors');
-// const openAI = require('./openAI');
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 const app = express();
@@ -93,19 +92,30 @@ async function run() {
 run().catch(console.dir);
 
 const { OpenAI } = require('openai')
-
 const openai = new OpenAI({ apiKey: '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' });
+const fs = require('fs').promises;
 
-const ideal_en_guarde = {"name":"En-Guarde","elbow_left":"96","hip_left":"117","knee_left":"121","elbow_right":"2","hip_right":"170","knee_right":"160"};
-const ideal_advance = {"name":"Advance","elbow_left":"87","hip_left":"126","knee_left":"132","elbow_right":"36","hip_right":"170","knee_right":"160"};
-const ideal_retreat = {"name":"Retreat","elbow_left":"90","hip_left":"127","knee_left":"144","elbow_right":"8","hip_right":"172","knee_right":"170"};
-const ideal_lunge = {"name":"Lunge","elbow_left":"178","hip_left":"84","knee_left":"110","elbow_right":"170","hip_right":"151","knee_right":"165"};
+async function loadJson(filePath) {
+  try {
+    const data = await fs.readFile(filePath, 'utf8');
+    return JSON.parse(data); 
+  } catch (error) {
+    console.error('Error reading or parsing the file:', error);
+    return null; 
+  }
+}
 
 function toJSON(user_angles) {
     return {"name":`${user_angles.name}`,"elbow_left":`${user_angles.elbow_left}`,"hip_left":`${user_angles.hip_left}`,"knee_left":`${user_angles.knee_left}`,"elbow_right":`${user_angles.elbow_right}`,"hip_right":`${user_angles.hip_right}`,"knee_right":`${user_angles.knee_right}`};
 }
 
 async function compareAngles(user_angles) {
+    
+    ideal_angles = await loadJson('ideal_angles.json');
+    let ideal_en_guarde = ideal_angles[0];
+    let ideal_advance = ideal_angles[1];
+    let ideal_retreat = ideal_angles[2];
+    let ideal_lunge = ideal_angles[3];
 
     let userAngles = toJSON(user_angles);
     let comparison;

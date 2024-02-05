@@ -1,0 +1,39 @@
+[
+    {
+      "name": "En-Guarde",
+      "elbow_left": "96",
+      "hip_left": "117",
+      "knee_left": "121",
+      "elbow_right": "2",
+      "hip_right": "170",
+      "knee_right": "160"
+    },
+    {
+      "name": "Advance",
+      "elbow_left": "87",
+      "hip_left": "126",
+      "knee_left": "132",
+      "elbow_right": "36",
+      "hip_right": "170",
+      "knee_right": "160"
+    },
+    {
+      "name": "Retreat",
+      "elbow_left": "90",
+      "hip_left": "127",
+      "knee_left": "144",
+      "elbow_right": "8",
+      "hip_right": "172",
+      "knee_right": "170"
+    },
+    {
+      "name": "Lunge",
+      "elbow_left": "178",
+      "hip_left": "84",
+      "knee_left": "110",
+      "elbow_right": "170",
+      "hip_right": "151",
+      "knee_right": "165"
+    }
+  ]
+  
