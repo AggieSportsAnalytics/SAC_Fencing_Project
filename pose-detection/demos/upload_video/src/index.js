@@ -223,8 +223,14 @@ async function updateVideo(event) {
     };
   });
 
+  // this is the code that changes the video width and height onclick
+  // const videoWidth = camera.video.videoWidth;
+  // const videoHeight = camera.video.videoHeight;
   const videoWidth = camera.video.videoWidth;
   const videoHeight = camera.video.videoHeight;
+  camera.video.classList.add('resized-video');
+  camera.canvas.classList.add('resized-canvas');
+
   // Must set below two lines, otherwise video element doesn't show.
   camera.video.width = videoWidth;
   camera.video.height = videoHeight;
@@ -381,6 +387,7 @@ startButton.addEventListener("click", () => {
       } else {
         // End of countdown, start actual stopwatch
         run();
+        document.getElementById('feedback').textContent = "Feedback on pose will be displayed here...";
         clearInterval(intervalId);
         startTime = Date.now() - elapsedTime;
         instructionDisplay.textContent += " GO!";
@@ -413,9 +420,11 @@ pauseButton.addEventListener("click", () => {
     milliseconds = 0;
     clearInterval(intervalId);
     totalTime = video.currentTime;
+    showPoseTimings();
     camera.inputToDB(detectPoseDB());
     console.log("Paused");
-    getAnglesFromMongo();
+    angles = camera.getUserAngles();
+    fetchComparisonData(camera.getUserAngles());  
   }
 });
 
@@ -435,6 +444,9 @@ function detectPoseDB() {
   instructions[currentInstruction] === "Perform a quick retreat..." ||
   instructions[currentInstruction] === "Perform a retreat...") {
     return "Retreat";
+  }
+  else if (instructions[currentInstruction] === "Perform a lunge...") {
+    return "Lunge";
   }
   else if (instructions[currentInstruction] === "Pause...") {
     return "Pause";
@@ -500,12 +512,21 @@ function updateTime() {
       paused = true;
       clearInterval(intervalId);
       totalTime = video.currentTime;
+      showPoseTimings();
       document.getElementById("feedback").textContent = "Generating feedback, please wait...";
       camera.inputToDB(detectPoseDB());
       angles = camera.getUserAngles();
       fetchComparisonData(camera.getUserAngles());
     }
   }
+}
+
+function showPoseTimings() {
+  const newTime = document.createElement('p');
+  newTime.innerHTML = `Pose: ${detectPoseDB()}<br>Time: 3.00s`;
+  newTime.style.borderBottom = '3px solid';
+  newTime.style.borderColor = 'black';
+  document.getElementById('timings').appendChild(newTime);
 }
 
 function showGPT(response) {
@@ -530,6 +551,8 @@ function fetchComparisonData(userAngles) {
       console.error('Error:', error);
   });
 }
+
+// Create div with all previous times and poses
 
 // const getAnglesFromMongo = async () => {
 //   try {
