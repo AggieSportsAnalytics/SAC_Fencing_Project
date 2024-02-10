@@ -21,6 +21,7 @@ import '@tensorflow/tfjs-backend-webgpu';
 import * as mpPose from '@mediapipe/pose';
 import * as tfjsWasm from '@tensorflow/tfjs-backend-wasm';
 import * as tf from '@tensorflow/tfjs-core';
+import * as cv from "@techstark/opencv-js"
 
 tfjsWasm.setWasmPaths(
     `https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm@${

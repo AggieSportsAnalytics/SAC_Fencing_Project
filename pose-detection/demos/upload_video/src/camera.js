@@ -15,10 +15,9 @@
  * =============================================================================
  */
 import * as posedetection from '@tensorflow-models/pose-detection';
-
 import * as params from './params';
-
-
+import * as cv from "@techstark/opencv-js"
+import DrawerElement from "../components/drawer.js";
 
 export class Context {
   constructor() {
@@ -199,6 +198,9 @@ export class Context {
     // });
   }
 
+  displayOpticFlow() {
+
+  }
 
   displayAngles(keypoints) {
     const kptriples = [
@@ -234,7 +236,7 @@ export class Context {
       const kp1 = keypoints[triple[0]];
       const kp2 = keypoints[triple[1]];
       const kp3 = keypoints[triple[2]];
-
+              
       // Gets angle between points, limiting it to two decimal points then putting into string
       const elbowAngle = this.calculateAngle(kp1, kp2, kp3);
       const angleText = "" + elbowAngle.toFixed(2);
@@ -243,6 +245,7 @@ export class Context {
       let x = kp2.x + 5;
       let y = kp2.y + 10;
 
+      
 
       let textWidth = this.ctx.measureText(angleText).width;
       this.ctx.textAlign = 'left';

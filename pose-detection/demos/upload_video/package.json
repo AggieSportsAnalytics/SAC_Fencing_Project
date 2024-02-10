@@ -9,13 +9,16 @@
     "node": ">=8.9.0"
   },
   "dependencies": {
+    "@mediapipe/pose": "~0.4.0",
+    "@techstark/opencv-js": "^4.9.0-release.2",
     "@tensorflow-models/pose-detection": "file:../../dist",
     "@tensorflow/tfjs-backend-wasm": "^4.10.0",
     "@tensorflow/tfjs-backend-webgl": "^4.10.0",
     "@tensorflow/tfjs-backend-webgpu": "^4.10.0",
     "@tensorflow/tfjs-converter": "^4.10.0",
     "@tensorflow/tfjs-core": "^4.10.0",
-    "@mediapipe/pose": "~0.4.0"
+    "choo": "^7.1.0",
+    "p5": "^1.9.0"
   },
   "scripts": {
     "watch": "cross-env NODE_ENV=development parcel index.html --no-hmr --open",
