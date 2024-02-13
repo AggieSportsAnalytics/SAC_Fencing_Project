@@ -15,14 +15,14 @@
  * =============================================================================
  */
 import * as posedetection from '@tensorflow-models/pose-detection';
+
 import * as params from './params';
+
 import * as cv from "@techstark/opencv-js"
 import DrawerElement from "../components/drawer.js";
 
 export class Context {
   constructor() {
-    // this.live = document.getElementById('vid');
-
     this.video = document.getElementById('video');
     this.canvas = document.getElementById('output');
     this.source = document.getElementById('currentVID');
@@ -33,21 +33,26 @@ export class Context {
     this.mediaRecorder.ondataavailable = this.handleDataAvailable;
   }
 
+userAngleNumber = 0;
+userAngles = {
+    // _id: 0, 
+    name: null, 
+    elbow_left: null,
+    hip_left: null,
+    knee_left: null, 
+    elbow_right: null,
+    hip_right: null,
+    knee_right: null 
+};
+
   drawCtx() {
     this.ctx.drawImage(
         this.video, 0, 0, this.video.videoWidth, this.video.videoHeight);
   }
-  // drawCtx(format) {
-  //   this.ctx.drawImage(
-  //       format, 0, 0, this.video.videoWidth, this.video.videoHeight);
-  // }
 
   clearCtx() {
     this.ctx.clearRect(0, 0, this.video.videoWidth, this.video.videoHeight);
   }
-  // clearCtx(format) {
-  //   this.ctx.clearRect(0, 0, format.videoWidth, format.videoHeight);
-  // }
 
   /**
    * Draw the keypoints and skeleton on the video.
@@ -70,17 +75,6 @@ export class Context {
       this.displayAngles(pose.keypoints);
     }
   }
-  // /**
-  //  * Draw the keypoints and skeleton on the video.
-  //  * @param pose A pose with keypoints to render.
-  //  */
-  //   drawResult(pose) {
-  //     if (pose.keypoints != null) {
-  //       this.drawSkeleton(pose.keypoints);
-  //       this.drawKeypoints(pose.keypoints);
-  //       this.displayAngle(pose.keypoints, format);
-  //     }
-  //   }
 
   /**
    * Draw the keypoints on the video.
@@ -198,18 +192,15 @@ export class Context {
     // });
   }
 
-  displayOpticFlow() {
-
-  }
 
   displayAngles(keypoints) {
     const kptriples = [
-      [5, 7, 9],
-      [6, 8, 10],
-      [6, 12, 14],
-      [5, 11, 13],
-      [12, 14, 16],
-      [11, 13, 15]
+      [5, 7, 9], // left elbow
+      [6, 8, 10], // right elbow
+      [6, 12, 14], // right hip
+      [5, 11, 13], // left hip
+      [12, 14, 16], // right knee
+      [11, 13, 15] // left knee
     ]
     // Slow down video according to elbow angle; we want to slow it down for
     // moments of extension
@@ -231,21 +222,29 @@ export class Context {
     this.video.playbackRate = 0.25;
     this.ctx.fillText("Playback Rate: " + this.video.playbackRate, this.video.videoWidth / 2, 20);
 
-
     kptriples.forEach((triple) => {
       const kp1 = keypoints[triple[0]];
       const kp2 = keypoints[triple[1]];
       const kp3 = keypoints[triple[2]];
-              
+
       // Gets angle between points, limiting it to two decimal points then putting into string
-      const elbowAngle = this.calculateAngle(kp1, kp2, kp3);
+      const elbowAngle = this.calculateAngle(kp1, kp2, kp3);      
       const angleText = "" + elbowAngle.toFixed(2);
+
+      //FIXME: if statements
+      if(triple[0] === 5 && triple[1] === 7 && triple[2] === 9) { this.userAngles.elbow_left = elbowAngle; }
+      else if(triple[0] === 6 && triple[1] === 8 && triple[2] === 10) { this.userAngles.elbow_right = elbowAngle; }
+      else if(triple[0] === 6 && triple[1] === 12 && triple[2] === 14) { this.userAngles.hip_left = elbowAngle; }
+      else if(triple[0] === 5 && triple[1] === 11 && triple[2] === 13) { this.userAngles.hip_right = elbowAngle; }
+      else if(triple[0] === 12 && triple[1] === 14 && triple[2] === 16) { this.userAngles.knee_left = elbowAngle; }
+      else if(triple[0] === 11 && triple[1] === 13 && triple[2] === 15) { this.userAngles.knee_right = elbowAngle; }
+      // console.log(`Triple: ${triple}`);
+      // console.log(`Angle: ${elbowAngle}\nUpdated Angle: ${this.userAngles.elbow_left}`);
 
       // Place angle text just slightly off of the middle point (kp2)
       let x = kp2.x + 5;
       let y = kp2.y + 10;
 
-      
 
       let textWidth = this.ctx.measureText(angleText).width;
       this.ctx.textAlign = 'left';
@@ -256,46 +255,6 @@ export class Context {
       this.ctx.fillText(angleText, x, y);
     });
   }
-  // displayAngle(keypoints, format) {
-  //   const kp1 = keypoints[6];
-  //   const kp2 = keypoints[8];
-  //   const kp3 = keypoints[10];
-  //   // Gets angle between points, limiting it to two decimal points then putting into string
-  //   const elbowAngle = this.calculateAngle(kp1, kp2, kp3);
-  //   const angleText = "" + elbowAngle.toFixed(2);
-
-  //   // Slow down video according to elbow angle; we want to slow it down for
-  //   // moments of extension
-  //   if (elbowAngle > 120) {
-  //     format.playbackRate = 0.25;
-  //   } else if (elbowAngle > 90) {
-  //     format.playbackRate = 0.5;
-  //   } else {
-  //     format.playbackRate = 1;
-  //   }
-
-
-  //   // Place angle text just slightly off of the middle point (kp2)
-  //   const x = kp2.x + 5;
-  //   const y = kp2.y + 10;
-
-  //   // Referenced following StackOverflow guide: https://stackoverflow.com/a/33138692
-  //   const fontsize = 20;
-  //   const fontface = 'roboto';
-  //   this.ctx.font = "bold " + fontsize + 'px ' + fontface;
-
-  //   this.ctx.fillText("Playback Rate: " + format.playbackRate, format.videoWidth / 2, 20)
-
-  //   const lineHeight = fontsize * 1.1;
-  //   const textWidth = this.ctx.measureText(angleText).width;
-  //   this.ctx.textAlign = 'left';
-  //   this.ctx.textBaseline = 'top';
-  //   this.ctx.fillStyle = 'Cyan';
-  //   this.ctx.fillRect(x, y, textWidth, lineHeight);
-  //   this.ctx.fillStyle = 'Black';
-  //   this.ctx.fillText(angleText, x, y);
-
-  // }
 
   calculateAngle(keypoint1, keypoint2, keypoint3) {
     //Start coordinates
@@ -330,6 +289,36 @@ export class Context {
 
   stop() {
     this.mediaRecorder.stop();
+  }
+
+  inputToDB(pose) {
+    if(pose != "Pause") {
+      this.userAngles.name = pose;
+      this.handleAnglesUpload(this.userAngles);
+    }
+  }
+
+  async handleAnglesUpload(document) {
+    try {
+      const response = await fetch('http://localhost:3000/api/angles', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name: document.name, elbow_left: document.elbow_left, hip_left: document.hip_left, knee_left: document.knee_left, elbow_right: document.elbow_right, hip_right: document.hip_right, knee_right: document.knee_right }),
+      });
+      console.log("Handling upload");
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return await response.json(); // Returns the added course with _id
+    } catch (error) {
+      console.error("Could not add the course to the database", error);
+    }
+  }
+
+  getUserAngles() {
+    return this.userAngles;
   }
 
   handleDataAvailable(event) {
