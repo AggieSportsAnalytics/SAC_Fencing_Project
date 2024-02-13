@@ -17,6 +17,7 @@
     "@tensorflow/tfjs-converter": "^4.10.0",
     "@tensorflow/tfjs-core": "^4.10.0",
     "@types/node": "^20.9.0",
+    "dotenv": "^16.4.3",
     "mongodb": "^6.3.0",
     "openai": "^4.24.7"
   },

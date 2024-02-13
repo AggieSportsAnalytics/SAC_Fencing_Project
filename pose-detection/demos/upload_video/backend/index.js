@@ -92,7 +92,8 @@ async function run() {
 run().catch(console.dir);
 
 const { OpenAI } = require('openai')
-const openai = new OpenAI({ apiKey: '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' });
+require('dotenv').config({ path: '../../../../.env' });
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const fs = require('fs').promises;
 
 async function loadJson(filePath) {
