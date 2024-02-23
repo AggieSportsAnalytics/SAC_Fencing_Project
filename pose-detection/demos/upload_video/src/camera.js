@@ -35,6 +35,8 @@ export class Context {
 
     this.prevPoint = {x: 0, y: 0};
     this.frameCount = 0;
+    this.startTime = Date.now();
+    this.currentSpeed = 0;
   }
 
   drawCtx() {
@@ -69,10 +71,20 @@ export class Context {
    */
   drawResult(pose) {
     if (pose.keypoints != null) {
-      this.frameCount += 1
+      // this.frameCount += 1
+      this.video.playbackRate = 0.25;
       this.drawSkeleton(pose.keypoints);
       this.drawKeypoints(pose.keypoints);
       this.displayAngles(pose.keypoints);
+      this.displayFeetDistance(pose.keypoints);
+
+      const fontsize = 20;
+      const fontface = 'roboto';
+      this.ctx.font = "bold " + fontsize + 'px ' + fontface;
+      const lineHeight = fontsize * 1.1;
+      this.ctx.strokeStyle = 'Red';
+      this.ctx.fillStyle = "Red";
+      this.ctx.fillText("Speed: " + this.currentSpeed + "px/s", this.video.videoWidth / 4, 20);
     }
   }
 
@@ -91,9 +103,23 @@ export class Context {
     for (const i of relevantPts) {
       this.drawKeypoint(keypoints[i]);
 
-      if (i === 6 && !(this.frameCount % 5)) {
-        console.log(keypoints[i].x - this.prevPoint.x);
-        this.prevPoint = keypoints[i];
+      if (i === 11) { // && !(this.frameCount % 5)) {
+        let timeElapsed = Date.now() - this.startTime;
+        if (timeElapsed > 500) {
+          let xDist = keypoints[i].x - this.prevPoint.x;
+          this.currentSpeed = xDist / (timeElapsed / 1000)
+          // console.log(xDist, this.currentSpeed, timeElapsed);
+          this.startTime = Date.now();
+          this.prevPoint = keypoints[i];
+        }
+
+        const fontsize = 20;
+        const fontface = 'roboto';
+        this.ctx.font = "bold " + fontsize + 'px ' + fontface;
+        const lineHeight = fontsize * 1.1;
+        this.ctx.strokeStyle = 'Red';
+        this.ctx.fillStyle = "Red";
+        this.ctx.fillText("Speed: " + this.currentSpeed + "px/s", this.video.videoWidth / 4, 20);
       }
     }
   }
@@ -150,6 +176,40 @@ export class Context {
     });
   }
 
+  displayFeetDistance(keypoints) {
+    const kp1 = keypoints[16];  // left foot
+    const kp2 = keypoints[15];  // right foot
+
+    // Calculate (horizontal) distance
+    const feetDistance = Math.abs(kp1.x - kp2.x);
+
+    // Display distance on line between the feet
+    this.ctx.fillStyle = 'Green';
+    this.ctx.strokeStyle = 'Green';
+    this.ctx.lineWidth = 5;//params.DEFAULT_LINE_WIDTH;
+    this.ctx.beginPath();
+    this.ctx.moveTo(kp1.x, kp1.y);
+    this.ctx.lineTo(kp2.x, kp2.y);
+    this.ctx.stroke();
+
+    const fontsize = 20;
+    const fontface = 'roboto';
+    this.ctx.font = "bold " + fontsize + 'px ' + fontface;
+    const lineHeight = fontsize * 1.1;
+    const distanceText = "" + feetDistance.toFixed(2);
+
+    const x = (kp1.x + kp2.x)/2
+    const y = (kp1.y + kp2.y)/2
+
+    let textWidth = this.ctx.measureText(distanceText).width;
+    this.ctx.textAlign = 'left';
+    this.ctx.textBaseline = 'top';
+    this.ctx.fillStyle = 'Green';
+    this.ctx.fillRect(x, y, textWidth, lineHeight);
+    this.ctx.fillStyle = 'Black';
+    this.ctx.fillText(distanceText, x, y);
+  }
+
 
   displayAngles(keypoints) {
     const kptriples = [
@@ -183,16 +243,16 @@ export class Context {
       const angleText = "" + jointAngle.toFixed(2);
 
       // Dynamically adjust speed of playback, based on elbow angle only
-      if (triple[1] === 8) {
-        if (jointAngle > 120) {
-          this.video.playbackRate = 0.25;
-        } else if (jointAngle > 90) {
-          this.video.playbackRate = 0.5;
-        } else {
-          this.video.playbackRate = 1;
-        }
-        this.ctx.fillText("Playback Rate: " + this.video.playbackRate, this.video.videoWidth / 2, 20);
-      }
+      // if (triple[1] === 8) {
+      //   if (jointAngle > 120) {
+      //     this.video.playbackRate = 0.25;
+      //   } else if (jointAngle > 90) {
+      //     this.video.playbackRate = 0.5;
+      //   } else {
+      //     this.video.playbackRate = 1;
+      //   }
+      //   this.ctx.fillText("Playback Rate: " + this.video.playbackRate, this.video.videoWidth / 2, 20);
+      // }
 
 
       // Place angle text just slightly off of the middle point (kp2)
