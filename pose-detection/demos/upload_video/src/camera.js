@@ -78,13 +78,13 @@ export class Context {
       this.displayAngles(pose.keypoints);
       this.displayFeetDistance(pose.keypoints);
 
-      const fontsize = 20;
-      const fontface = 'roboto';
-      this.ctx.font = "bold " + fontsize + 'px ' + fontface;
-      const lineHeight = fontsize * 1.1;
-      this.ctx.strokeStyle = 'Red';
-      this.ctx.fillStyle = "Red";
-      this.ctx.fillText("Speed: " + this.currentSpeed + "px/s", this.video.videoWidth / 4, 20);
+      // const fontsize = 20;
+      // const fontface = 'roboto';
+      // this.ctx.font = "bold " + fontsize + 'px ' + fontface;
+      // const lineHeight = fontsize * 1.1;
+      // this.ctx.strokeStyle = 'Red';
+      // this.ctx.fillStyle = "Red";
+      // this.ctx.fillText("Speed: " + this.currentSpeed + "px/s", this.video.videoWidth / 4, 20);
     }
   }
 
@@ -119,7 +119,7 @@ export class Context {
         const lineHeight = fontsize * 1.1;
         this.ctx.strokeStyle = 'Red';
         this.ctx.fillStyle = "Red";
-        this.ctx.fillText("Speed: " + this.currentSpeed + "px/s", this.video.videoWidth / 4, 20);
+        this.ctx.fillText("Speed: " + this.currentSpeed + "px/s", this.video.videoWidth / 3, 20);
       }
     }
   }
@@ -208,6 +208,28 @@ export class Context {
     this.ctx.fillRect(x, y, textWidth, lineHeight);
     this.ctx.fillStyle = 'Black';
     this.ctx.fillText(distanceText, x, y);
+
+    let predictedPose = "";
+    let absSpeed = Math.abs(this.currentSpeed)
+    // Hardcoded cutoffs, we might want to tune these
+    if (feetDistance > 325) {
+      predictedPose = "lunge";
+    } else if (feetDistance > 200) {
+      predictedPose = (this.currentSpeed > 0) ? "advance" : "retreat";
+    } else {
+      // Distance less than 200px, could be en guarde or part of an advance/retreat
+      if (absSpeed > 20) {
+        // Probably advance/retreat
+        predictedPose = (this.currentSpeed > 0) ? "advance" : "retreat";
+      } else {
+        // Probably en guarde
+        predictedPose = "en guarde"
+      }
+    }
+
+    this.ctx.strokeStyle = 'Green';
+    this.ctx.fillStyle = "Green";
+    this.ctx.fillText("Predicted pose: " + predictedPose, 2*this.video.videoWidth / 3, 20);
   }
 
 
